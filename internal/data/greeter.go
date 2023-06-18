@@ -29,8 +29,11 @@ func (r *greeterRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter,
 	return g, nil
 }
 
-func (r *greeterRepo) FindByID(context.Context, int64) (*biz.Greeter, error) {
-	return nil, nil
+func (r *greeterRepo) FindByID(context.Context, int64) (dataset *biz.UserActionLog, err error) {
+	db := r.data.DataBase
+	// var dataset UserActionLog
+	res := db.Table("se_user_action_log").First(&dataset)
+	return dataset, res.Error
 }
 
 func (r *greeterRepo) ListByHello(context.Context, string) ([]*biz.Greeter, error) {

@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "cdncloud/api/helloworld/v1"
+	v1 "cdncloud/api/v1"
 	"cdncloud/internal/conf"
 	"cdncloud/internal/service"
 

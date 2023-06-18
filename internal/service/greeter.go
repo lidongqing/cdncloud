@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	v1 "cdncloud/api/helloworld/v1"
+	v1 "cdncloud/api/v1"
 	"cdncloud/internal/biz"
 )
 
@@ -21,9 +21,11 @@ func NewGreeterService(uc *biz.GreeterUsecase) *GreeterService {
 
 // SayHello implements helloworld.GreeterServer.
 func (s *GreeterService) SayHello(ctx context.Context, in *v1.HelloRequest) (*v1.HelloReply, error) {
-	g, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: in.Name})
-	if err != nil {
-		return nil, err
-	}
-	return &v1.HelloReply{Message: "Hello " + g.Hello}, nil
+	g, err := s.uc.FindByID(ctx, &biz.Greeter{Hello: in.Name, Id: 1})
+
+	// g, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: in.Name})
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return &v1.HelloReply{Message: "Hello " + g.Url}, err
 }

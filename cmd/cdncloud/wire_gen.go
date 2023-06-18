@@ -8,20 +8,29 @@ package main
 
 import (
 	"cdncloud/internal/biz"
+	"cdncloud/internal/biz/logic"
 	"cdncloud/internal/conf"
 	"cdncloud/internal/data"
 	"cdncloud/internal/server"
 	"cdncloud/internal/service"
-
+	"cdncloud/internal/service/api"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+)
+
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+	db, err := data.NewDataBase(confData)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(confData, logger, db)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,7 +38,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
 	greeterService := service.NewGreeterService(greeterUsecase)
 	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
+	userRepo := data.NewUserRepo(dataData, logger)
+	userLogic := logic.NewUserLogic(userRepo)
+	userService := api.NewUserService(userLogic)
+	httpServer := server.NewHTTPServer(confServer, greeterService, userService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

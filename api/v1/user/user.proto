@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package api.v1.user;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "cdncloud/api/v1.user";
+
+
+// The greeting service definition.
+service User {
+  // Sends a greeting
+  rpc CheckMobile (CheckMobileRequest) returns (CheckMobileReply) {
+    option (google.api.http) = {
+      get: "/api/user/checkMobile"
+    };
+  }
+}
+
+message CheckMobileRequest {
+  string mobile = 1;
+}
+
+message CheckMobileReply {
+  bool is_avail = 1;
+}
