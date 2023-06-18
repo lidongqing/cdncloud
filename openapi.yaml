@@ -7,16 +7,17 @@ info:
     version: 0.0.1
 paths:
     /api/user/checkMobile:
-        get:
+        post:
             tags:
                 - User
             description: Sends a greeting
             operationId: User_CheckMobile
-            parameters:
-                - name: mobile
-                  in: query
-                  schema:
-                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.CheckMobileRequest'
+                required: true
             responses:
                 "200":
                     description: OK
@@ -24,6 +25,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.CheckMobileReply'
+    /api/user/register:
+        post:
+            tags:
+                - User
+            operationId: User_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.RegisterRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.RegisterReply'
     /helloworld/{name}:
         get:
             tags:
@@ -50,6 +69,30 @@ components:
             properties:
                 isAvail:
                     type: boolean
+        api.v1.user.CheckMobileRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+        api.v1.user.RegisterReply:
+            type: object
+            properties:
+                userId:
+                    type: integer
+                    format: int64
+        api.v1.user.RegisterRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
         helloworld.v1.HelloReply:
             type: object
             properties:

@@ -18,20 +18,23 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationUserCheckMobile = "/api.v1.user.User/CheckMobile"
+const OperationUserRegister = "/api.v1.user.User/Register"
 
 type UserHTTPServer interface {
 	CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileReply, error)
+	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 }
 
 func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r := s.Route("/")
-	r.GET("/api/user/checkMobile", _User_CheckMobile0_HTTP_Handler(srv))
+	r.POST("/api/user/checkMobile", _User_CheckMobile0_HTTP_Handler(srv))
+	r.POST("/api/user/register", _User_Register0_HTTP_Handler(srv))
 }
 
 func _User_CheckMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CheckMobileRequest
-		if err := ctx.BindQuery(&in); err != nil {
+		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationUserCheckMobile)
@@ -47,8 +50,28 @@ func _User_CheckMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 	}
 }
 
+func _User_Register0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RegisterRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserRegister)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Register(ctx, req.(*RegisterRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RegisterReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	CheckMobile(ctx context.Context, req *CheckMobileRequest, opts ...http.CallOption) (rsp *CheckMobileReply, err error)
+	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 }
 
 type UserHTTPClientImpl struct {
@@ -62,10 +85,23 @@ func NewUserHTTPClient(client *http.Client) UserHTTPClient {
 func (c *UserHTTPClientImpl) CheckMobile(ctx context.Context, in *CheckMobileRequest, opts ...http.CallOption) (*CheckMobileReply, error) {
 	var out CheckMobileReply
 	pattern := "/api/user/checkMobile"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserCheckMobile))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
+	var out RegisterReply
+	pattern := "/api/user/register"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserRegister))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

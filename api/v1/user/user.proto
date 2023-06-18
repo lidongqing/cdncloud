@@ -13,7 +13,15 @@ service User {
   // Sends a greeting
   rpc CheckMobile (CheckMobileRequest) returns (CheckMobileReply) {
     option (google.api.http) = {
-      get: "/api/user/checkMobile"
+      post: "/api/user/checkMobile"
+      body: "*"
+    };
+  }
+
+  rpc Register (RegisterRequest) returns (RegisterReply) {
+    option (google.api.http) = {
+      post: "/api/user/register"
+      body: "*"
     };
   }
 }
@@ -24,4 +32,16 @@ message CheckMobileRequest {
 
 message CheckMobileReply {
   bool is_avail = 1;
+}
+
+message RegisterRequest {
+  string mobile = 1;
+  string email = 2;
+  string password = 3;
+  string repassword = 4;
+  string code = 5;
+}
+
+message RegisterReply {
+  int64 user_id = 1;
 }
