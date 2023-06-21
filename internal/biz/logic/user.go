@@ -86,10 +86,19 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 }
 
 // 登录
-func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, passwd string) (success bool, err error) {
+func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, passwd string, code string) (success bool, err error) {
 	if email == "" && mobile == "" {
 		return false, errors.New("手机号/邮箱不能为空")
 	}
+	//验证码验证
+	codeRes, err := ul.CheckCode(ctx, code)
+	if err != nil {
+		return false, err
+	}
+	if !codeRes {
+		return false, errors.New("验证码错误")
+	}
+
 	var user *model.User
 	// 根据邮箱和密码获取用户信息
 	if email != "" {

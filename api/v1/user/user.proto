@@ -24,6 +24,23 @@ service User {
       body: "*"
     };
   }
+  rpc Login (LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/api/user/login"
+      body: "*"
+    };
+  }
+  rpc GetVerifyCode (GetVerifyCodeRequest) returns (GetVerifyCodeReply) {
+    option (google.api.http) = {
+      get: "/api/user/getVerifyCode"
+    };
+  }
+  rpc ResetPassWd (ResetPassWdRequest) returns (ResetPassWdReply) {
+    option (google.api.http) = {
+      post: "/api/user/resetPasswd"
+      body: "*"
+    };
+  }
 }
 
 message CheckMobileRequest {
@@ -44,4 +61,34 @@ message RegisterRequest {
 
 message RegisterReply {
   int64 user_id = 1;
+}
+
+message LoginRequest {
+  string mobile = 1;
+  string email = 2;
+  string password = 3;
+  string code = 4;
+}
+
+message LoginReply{
+  bool is_login = 1;
+}
+
+message GetVerifyCodeRequest {
+}
+
+message GetVerifyCodeReply {
+  string url = 1;
+}
+
+message ResetPassWdRequest {
+  string mobile = 1;
+  string email = 2;
+  string password = 3;
+  string repassword = 4;
+  string code = 5;
+}
+
+message ResetPassWdReply {
+  bool is_reset = 1;
 }

@@ -25,6 +25,36 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.CheckMobileReply'
+    /api/user/getVerifyCode:
+        get:
+            tags:
+                - User
+            operationId: User_GetVerifyCode
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetVerifyCodeReply'
+    /api/user/login:
+        post:
+            tags:
+                - User
+            operationId: User_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.LoginReply'
     /api/user/register:
         post:
             tags:
@@ -43,6 +73,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.RegisterReply'
+    /api/user/resetPasswd:
+        post:
+            tags:
+                - User
+            operationId: User_ResetPassWd
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.ResetPassWdRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.ResetPassWdReply'
     /helloworld/{name}:
         get:
             tags:
@@ -74,6 +122,27 @@ components:
             properties:
                 mobile:
                     type: string
+        api.v1.user.GetVerifyCodeReply:
+            type: object
+            properties:
+                url:
+                    type: string
+        api.v1.user.LoginReply:
+            type: object
+            properties:
+                isLogin:
+                    type: boolean
+        api.v1.user.LoginRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                code:
+                    type: string
         api.v1.user.RegisterReply:
             type: object
             properties:
@@ -81,6 +150,24 @@ components:
                     type: integer
                     format: int64
         api.v1.user.RegisterRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.ResetPassWdReply:
+            type: object
+            properties:
+                isReset:
+                    type: boolean
+        api.v1.user.ResetPassWdRequest:
             type: object
             properties:
                 mobile:

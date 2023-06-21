@@ -25,6 +25,9 @@ type UserClient interface {
 	// Sends a greeting
 	CheckMobile(ctx context.Context, in *CheckMobileRequest, opts ...grpc.CallOption) (*CheckMobileReply, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	GetVerifyCode(ctx context.Context, in *GetVerifyCodeRequest, opts ...grpc.CallOption) (*GetVerifyCodeReply, error)
+	ResetPassWd(ctx context.Context, in *ResetPassWdRequest, opts ...grpc.CallOption) (*ResetPassWdReply, error)
 }
 
 type userClient struct {
@@ -53,6 +56,33 @@ func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...
 	return out, nil
 }
 
+func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetVerifyCode(ctx context.Context, in *GetVerifyCodeRequest, opts ...grpc.CallOption) (*GetVerifyCodeReply, error) {
+	out := new(GetVerifyCodeReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetVerifyCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ResetPassWd(ctx context.Context, in *ResetPassWdRequest, opts ...grpc.CallOption) (*ResetPassWdReply, error) {
+	out := new(ResetPassWdReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/ResetPassWd", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -60,6 +90,9 @@ type UserServer interface {
 	// Sends a greeting
 	CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
+	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	GetVerifyCode(context.Context, *GetVerifyCodeRequest) (*GetVerifyCodeReply, error)
+	ResetPassWd(context.Context, *ResetPassWdRequest) (*ResetPassWdReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -72,6 +105,15 @@ func (UnimplementedUserServer) CheckMobile(context.Context, *CheckMobileRequest)
 }
 func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServer) GetVerifyCode(context.Context, *GetVerifyCodeRequest) (*GetVerifyCodeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVerifyCode not implemented")
+}
+func (UnimplementedUserServer) ResetPassWd(context.Context, *ResetPassWdRequest) (*ResetPassWdReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassWd not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -122,6 +164,60 @@ func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetVerifyCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetVerifyCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/GetVerifyCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetVerifyCode(ctx, req.(*GetVerifyCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ResetPassWd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPassWdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ResetPassWd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/ResetPassWd",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ResetPassWd(ctx, req.(*ResetPassWdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -136,6 +232,18 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _User_Register_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _User_Login_Handler,
+		},
+		{
+			MethodName: "GetVerifyCode",
+			Handler:    _User_GetVerifyCode_Handler,
+		},
+		{
+			MethodName: "ResetPassWd",
+			Handler:    _User_ResetPassWd_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

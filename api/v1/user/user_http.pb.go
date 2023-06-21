@@ -18,17 +18,26 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationUserCheckMobile = "/api.v1.user.User/CheckMobile"
+const OperationUserGetVerifyCode = "/api.v1.user.User/GetVerifyCode"
+const OperationUserLogin = "/api.v1.user.User/Login"
 const OperationUserRegister = "/api.v1.user.User/Register"
+const OperationUserResetPassWd = "/api.v1.user.User/ResetPassWd"
 
 type UserHTTPServer interface {
 	CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileReply, error)
+	GetVerifyCode(context.Context, *GetVerifyCodeRequest) (*GetVerifyCodeReply, error)
+	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
+	ResetPassWd(context.Context, *ResetPassWdRequest) (*ResetPassWdReply, error)
 }
 
 func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/user/checkMobile", _User_CheckMobile0_HTTP_Handler(srv))
 	r.POST("/api/user/register", _User_Register0_HTTP_Handler(srv))
+	r.POST("/api/user/login", _User_Login0_HTTP_Handler(srv))
+	r.GET("/api/user/getVerifyCode", _User_GetVerifyCode0_HTTP_Handler(srv))
+	r.POST("/api/user/resetPasswd", _User_ResetPassWd0_HTTP_Handler(srv))
 }
 
 func _User_CheckMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -69,9 +78,69 @@ func _User_Register0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) err
 	}
 }
 
+func _User_Login0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Login(ctx, req.(*LoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_GetVerifyCode0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetVerifyCodeRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserGetVerifyCode)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetVerifyCode(ctx, req.(*GetVerifyCodeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetVerifyCodeReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_ResetPassWd0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ResetPassWdRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserResetPassWd)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ResetPassWd(ctx, req.(*ResetPassWdRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ResetPassWdReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	CheckMobile(ctx context.Context, req *CheckMobileRequest, opts ...http.CallOption) (rsp *CheckMobileReply, err error)
+	GetVerifyCode(ctx context.Context, req *GetVerifyCodeRequest, opts ...http.CallOption) (rsp *GetVerifyCodeReply, err error)
+	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
+	ResetPassWd(ctx context.Context, req *ResetPassWdRequest, opts ...http.CallOption) (rsp *ResetPassWdReply, err error)
 }
 
 type UserHTTPClientImpl struct {
@@ -95,11 +164,50 @@ func (c *UserHTTPClientImpl) CheckMobile(ctx context.Context, in *CheckMobileReq
 	return &out, err
 }
 
+func (c *UserHTTPClientImpl) GetVerifyCode(ctx context.Context, in *GetVerifyCodeRequest, opts ...http.CallOption) (*GetVerifyCodeReply, error) {
+	var out GetVerifyCodeReply
+	pattern := "/api/user/getVerifyCode"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserGetVerifyCode))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
+	var out LoginReply
+	pattern := "/api/user/login"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserLogin))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *UserHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
 	pattern := "/api/user/register"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserRegister))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) ResetPassWd(ctx context.Context, in *ResetPassWdRequest, opts ...http.CallOption) (*ResetPassWdReply, error) {
+	var out ResetPassWdReply
+	pattern := "/api/user/resetPasswd"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserResetPassWd))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
