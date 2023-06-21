@@ -7,6 +7,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"math/rand"
+	"time"
 )
 
 type UserLogic struct {
@@ -55,8 +57,17 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 		userName = email
 	}
 
+	//随机生成6位包含数字大小写字母的字符串，作为salt
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, 6)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	salt := string(b)
+
 	// 密码明文加密
-	passwd, err = ul.EncryptPasswd(ctx, passwd)
+	passwd, err = ul.EncryptPasswd(ctx, passwd, salt)
 	if err != nil {
 		return 0, err
 	}
@@ -67,6 +78,7 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 		Email:    email,
 		Mobile:   mobile,
 		Password: passwd,
+		Salt:     salt,
 		Status:   model.USER_STATUS_NORMAL,
 	}
 	userId, err = ul.userRepo.Save(ctx, user)
@@ -103,8 +115,21 @@ func (ul *UserLogic) CheckCode(ctx *context.Context, code string) (bool, error) 
 }
 
 // 密码明文加密
-func (ul *UserLogic) EncryptPasswd(ctx *context.Context, passwd string) (string, error) {
+func (ul *UserLogic) EncryptPasswd(ctx *context.Context, passwd string, salt string) (string, error) {
 	md5Sum := md5.Sum([]byte(passwd))
 	md5Str := hex.EncodeToString(md5Sum[:])
+	// 加盐
+	md5Sum = md5.Sum([]byte(md5Str + salt))
+	md5Str = hex.EncodeToString(md5Sum[:])
 	return md5Str, nil
+}
+
+// 发送手机验证码
+func (ul *UserLogic) SendMobileCode(ctx *context.Context, mobile string) (bool, error) {
+	return true, nil
+}
+
+// 发送邮箱验证码
+func (ul *UserLogic) SendEmailCode(ctx *context.Context, email string) (bool, error) {
+	return true, nil
 }
