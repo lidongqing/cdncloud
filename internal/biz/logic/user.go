@@ -85,6 +85,118 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 	return
 }
 
+// 登录
+func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, passwd string) (success bool, err error) {
+	if email == "" && mobile == "" {
+		return false, errors.New("手机号/邮箱不能为空")
+	}
+	var user *model.User
+	// 根据邮箱和密码获取用户信息
+	if email != "" {
+		// 检查邮箱是否存在
+		user, err := ul.userRepo.GetUserInfoByEmail(ctx, email)
+		if err != nil {
+			return false, err
+		}
+		if user.Id == 0 {
+			//更新登录失败计数
+			failNum, err := ul.UpdateLoginFailCount(ctx, user.Id, false)
+			if err != nil {
+				return false, err
+			}
+			if failNum >= 5 {
+				return false, errors.New("登录失败次数过多，请稍后再试")
+			}
+			return false, errors.New("用户不存在")
+		}
+		// 密码明文加密
+		passwd, err = ul.EncryptPasswd(ctx, passwd, user.Salt)
+		if err != nil {
+			return false, err
+		}
+		user, err = ul.userRepo.GetUserInfoByEmailAndPasswd(ctx, email, passwd)
+		if err != nil {
+			return false, err
+		}
+		if user.Id == 0 {
+			//更新登录失败计数
+			failNum, err := ul.UpdateLoginFailCount(ctx, user.Id, false)
+			if err != nil {
+				return false, err
+			}
+			if failNum >= 5 {
+				return false, errors.New("登录失败次数过多，请稍后再试")
+			}
+			return false, errors.New("用户名或密码错误")
+		}
+	}
+
+	// 根据手机号和密码获取用户信息
+	if mobile != "" {
+		// 检查手机号是否存在
+		user, err := ul.userRepo.GetUserInfoByMobile(ctx, mobile)
+		if err != nil {
+			return false, err
+		}
+		if user.Id == 0 {
+			//更新登录失败计数
+			failNum, err := ul.UpdateLoginFailCount(ctx, user.Id, false)
+			if err != nil {
+				return false, err
+			}
+			if failNum >= 5 {
+				return false, errors.New("登录失败次数过多，请稍后再试")
+			}
+			return false, errors.New("用户不存在")
+		}
+		// 密码明文加密
+		passwd, err = ul.EncryptPasswd(ctx, passwd, user.Salt)
+		if err != nil {
+			return false, err
+		}
+		user, err = ul.userRepo.GetUserInfoByMobileAndPasswd(ctx, mobile, passwd)
+		if err != nil {
+			return false, err
+		}
+		if user.Id == 0 {
+			//更新登录失败计数
+			failNum, err := ul.UpdateLoginFailCount(ctx, user.Id, false)
+			if err != nil {
+				return false, err
+			}
+			if failNum >= 5 {
+				return false, errors.New("登录失败次数过多，请稍后再试")
+			}
+			return false, errors.New("用户名或密码错误")
+		}
+	}
+	//登录成功，更新登录失败计数
+	ul.UpdateLoginFailCount(ctx, user.Id, true)
+	//@todo:记录登录日志
+	//@todo:更新登录时间
+	//@todo:更新登录ip
+	//@todo:更新登录状态
+	return true, nil
+}
+
+// 更新登录失败计数，登录失败次数超过5次，将暂时禁止登录
+func (ul *UserLogic) UpdateLoginFailCount(ctx *context.Context, userId int64, reset bool) (failNum int64, err error) {
+	if reset {
+		failNum = 0
+	} else {
+		user, err := ul.userRepo.GetUserInfoById(ctx, userId)
+		if err != nil {
+			return 0, err
+		}
+		failNum = user.LoginTimes + 1
+	}
+	_, err = ul.userRepo.UpdateLoginFailCount(ctx, userId, failNum)
+	if err != nil {
+		return 0, err
+	}
+	return failNum, nil
+}
+
 // 检查手机号是否可用
 func (ul *UserLogic) CheckMobile(ctx *context.Context, mobile string) (bool, error) {
 	user, err := ul.userRepo.GetUserInfoByMobile(ctx, mobile)

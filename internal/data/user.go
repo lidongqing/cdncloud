@@ -26,6 +26,13 @@ func (r *userRepo) Save(ctx *context.Context, u *model.User) (userId int64, err 
 	return u.Id, err
 }
 
+// 根据用户id获取用户信息
+func (r *userRepo) GetUserInfoById(ctx *context.Context, userId int64) (user *model.User, err error) {
+	db := r.data.DataBase
+	err = db.Where("id = ?", userId).Find(&user).Error
+	return
+}
+
 // 根据邮箱和密码获取用户信息
 func (r *userRepo) GetUserInfoByEmailAndPasswd(ctx *context.Context, email string, passwd string) (user *model.User, err error) {
 	db := r.data.DataBase
@@ -52,4 +59,14 @@ func (r *userRepo) GetUserInfoByMobile(ctx *context.Context, mobile string) (use
 	db := r.data.DataBase
 	err = db.Where("mobile = ?", mobile).Find(&user).Error
 	return
+}
+
+// 更新登录失败次数
+func (r *userRepo) UpdateLoginFailCount(ctx *context.Context, userId int64, failNum int64) (success bool, err error) {
+	db := r.data.DataBase
+	err = db.Model(&model.User{}).Where("id = ?", userId).Update("login_times", failNum).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
