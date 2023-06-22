@@ -7,37 +7,59 @@ import "validate/validate.proto";
 
 option go_package = "cdncloud/api/v1.user";
 
-
-// The greeting service definition.
 service User {
-  // Sends a greeting
-  rpc CheckMobile (CheckMobileRequest) returns (CheckMobileReply) {
+  // 手机号注册
+  rpc RegisterByMobile (RegisterByMobileRequest) returns (RegisterReply) {
     option (google.api.http) = {
-      post: "/api/user/checkMobile"
+      post: "/api/user/registerByMobile"
       body: "*"
     };
   }
-
-  rpc Register (RegisterRequest) returns (RegisterReply) {
+  // 邮箱注册
+  rpc RegisterByEmail (RegisterByEmailRequest) returns (RegisterReply) {
     option (google.api.http) = {
-      post: "/api/user/register"
+      post: "/api/user/registerByEmail"
       body: "*"
     };
   }
-  rpc Login (LoginRequest) returns (LoginReply) {
+  // 登录
+  rpc Login (LoginRequest) returns (EmptyReply) {
     option (google.api.http) = {
       post: "/api/user/login"
       body: "*"
     };
   }
-  rpc GetVerifyCode (GetVerifyCodeRequest) returns (GetVerifyCodeReply) {
+  // 获取图片验证码
+  rpc GetImageVerifyCode (EmptyRequest) returns (GetImageVerifyCodeReply) {
     option (google.api.http) = {
-      get: "/api/user/getVerifyCode"
+      get: "/api/user/getImageVerifyCode"
     };
   }
-  rpc ResetPassWd (ResetPassWdRequest) returns (ResetPassWdReply) {
+  // 发送手机验证码
+  rpc SendMobileVerifyCode (SendMobileVerifyCodeRequest) returns (EmptyReply) {
     option (google.api.http) = {
-      post: "/api/user/resetPasswd"
+      post: "/api/user/sendMobileVerifyCode"
+      body: "*"
+    };
+  }
+  // 发送邮箱验证码
+  rpc GetEmailVerifyCode (SendEmailVerifyCodeRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/sendEmailVerifyCode"
+      body: "*"
+    };
+  }
+  // 通过手机修改密码
+  rpc ChangePasswdByMobile (ChangePasswdByMobileRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/changePasswdByMobile"
+      body: "*"
+    };
+  }
+  // 通过邮箱修改密码
+  rpc ChangePasswdByEmail (ChangePasswdByEmailRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/changePasswdByEmail"
       body: "*"
     };
   }
@@ -51,9 +73,15 @@ message CheckMobileReply {
   bool is_avail = 1;
 }
 
-message RegisterRequest {
+message EmptyRequest {
+}
+
+message EmptyReply {
+}
+
+message RegisterByMobileRequest {
   string mobile = 1;
-  string email = 2;
+  string mobilePre = 2;
   string password = 3;
   string repassword = 4;
   string code = 5;
@@ -63,6 +91,13 @@ message RegisterReply {
   int64 user_id = 1;
 }
 
+message RegisterByEmailRequest {
+  string email = 1;
+  string password = 2;
+  string repassword = 3;
+  string code = 4;
+}
+
 message LoginRequest {
   string mobile = 1;
   string email = 2;
@@ -70,25 +105,28 @@ message LoginRequest {
   string code = 4;
 }
 
-message LoginReply{
-  bool is_login = 1;
-}
-
-message GetVerifyCodeRequest {
-}
-
-message GetVerifyCodeReply {
+message GetImageVerifyCodeReply {
   string url = 1;
 }
 
-message ResetPassWdRequest {
+message SendMobileVerifyCodeRequest {
   string mobile = 1;
-  string email = 2;
+}
+
+message SendEmailVerifyCodeRequest {
+  string email = 1;
+}
+
+message ChangePasswdByMobileRequest {
+  string mobile = 1;
   string password = 3;
   string repassword = 4;
   string code = 5;
 }
 
-message ResetPassWdReply {
-  bool is_reset = 1;
+message ChangePasswdByEmailRequest {
+  string email = 1;
+  string password = 3;
+  string repassword = 4;
+  string code = 5;
 }

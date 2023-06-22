@@ -22,12 +22,22 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserClient interface {
-	// Sends a greeting
-	CheckMobile(ctx context.Context, in *CheckMobileRequest, opts ...grpc.CallOption) (*CheckMobileReply, error)
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
-	GetVerifyCode(ctx context.Context, in *GetVerifyCodeRequest, opts ...grpc.CallOption) (*GetVerifyCodeReply, error)
-	ResetPassWd(ctx context.Context, in *ResetPassWdRequest, opts ...grpc.CallOption) (*ResetPassWdReply, error)
+	// 手机号注册
+	RegisterByMobile(ctx context.Context, in *RegisterByMobileRequest, opts ...grpc.CallOption) (*RegisterReply, error)
+	// 邮箱注册
+	RegisterByEmail(ctx context.Context, in *RegisterByEmailRequest, opts ...grpc.CallOption) (*RegisterReply, error)
+	// 登录
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 获取图片验证码
+	GetImageVerifyCode(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetImageVerifyCodeReply, error)
+	// 发送手机验证码
+	SendMobileVerifyCode(ctx context.Context, in *SendMobileVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 发送邮箱验证码
+	GetEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 通过手机修改密码
+	ChangePasswdByMobile(ctx context.Context, in *ChangePasswdByMobileRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 通过邮箱修改密码
+	ChangePasswdByEmail(ctx context.Context, in *ChangePasswdByEmailRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 }
 
 type userClient struct {
@@ -38,26 +48,26 @@ func NewUserClient(cc grpc.ClientConnInterface) UserClient {
 	return &userClient{cc}
 }
 
-func (c *userClient) CheckMobile(ctx context.Context, in *CheckMobileRequest, opts ...grpc.CallOption) (*CheckMobileReply, error) {
-	out := new(CheckMobileReply)
-	err := c.cc.Invoke(ctx, "/api.v1.user.User/CheckMobile", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
+func (c *userClient) RegisterByMobile(ctx context.Context, in *RegisterByMobileRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
 	out := new(RegisterReply)
-	err := c.cc.Invoke(ctx, "/api.v1.user.User/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/RegisterByMobile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
-	out := new(LoginReply)
+func (c *userClient) RegisterByEmail(ctx context.Context, in *RegisterByEmailRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
+	out := new(RegisterReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/RegisterByEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
 	err := c.cc.Invoke(ctx, "/api.v1.user.User/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,18 +75,45 @@ func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *userClient) GetVerifyCode(ctx context.Context, in *GetVerifyCodeRequest, opts ...grpc.CallOption) (*GetVerifyCodeReply, error) {
-	out := new(GetVerifyCodeReply)
-	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetVerifyCode", in, out, opts...)
+func (c *userClient) GetImageVerifyCode(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetImageVerifyCodeReply, error) {
+	out := new(GetImageVerifyCodeReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetImageVerifyCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) ResetPassWd(ctx context.Context, in *ResetPassWdRequest, opts ...grpc.CallOption) (*ResetPassWdReply, error) {
-	out := new(ResetPassWdReply)
-	err := c.cc.Invoke(ctx, "/api.v1.user.User/ResetPassWd", in, out, opts...)
+func (c *userClient) SendMobileVerifyCode(ctx context.Context, in *SendMobileVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/SendMobileVerifyCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetEmailVerifyCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ChangePasswdByMobile(ctx context.Context, in *ChangePasswdByMobileRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/ChangePasswdByMobile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ChangePasswdByEmail(ctx context.Context, in *ChangePasswdByEmailRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/ChangePasswdByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +124,22 @@ func (c *userClient) ResetPassWd(ctx context.Context, in *ResetPassWdRequest, op
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
-	// Sends a greeting
-	CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileReply, error)
-	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
-	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	GetVerifyCode(context.Context, *GetVerifyCodeRequest) (*GetVerifyCodeReply, error)
-	ResetPassWd(context.Context, *ResetPassWdRequest) (*ResetPassWdReply, error)
+	// 手机号注册
+	RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error)
+	// 邮箱注册
+	RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error)
+	// 登录
+	Login(context.Context, *LoginRequest) (*EmptyReply, error)
+	// 获取图片验证码
+	GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error)
+	// 发送手机验证码
+	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
+	// 发送邮箱验证码
+	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
+	// 通过手机修改密码
+	ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error)
+	// 通过邮箱修改密码
+	ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -100,20 +147,29 @@ type UserServer interface {
 type UnimplementedUserServer struct {
 }
 
-func (UnimplementedUserServer) CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckMobile not implemented")
+func (UnimplementedUserServer) RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterByMobile not implemented")
 }
-func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+func (UnimplementedUserServer) RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterByEmail not implemented")
 }
-func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
+func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedUserServer) GetVerifyCode(context.Context, *GetVerifyCodeRequest) (*GetVerifyCodeReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVerifyCode not implemented")
+func (UnimplementedUserServer) GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetImageVerifyCode not implemented")
 }
-func (UnimplementedUserServer) ResetPassWd(context.Context, *ResetPassWdRequest) (*ResetPassWdReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ResetPassWd not implemented")
+func (UnimplementedUserServer) SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendMobileVerifyCode not implemented")
+}
+func (UnimplementedUserServer) GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEmailVerifyCode not implemented")
+}
+func (UnimplementedUserServer) ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePasswdByMobile not implemented")
+}
+func (UnimplementedUserServer) ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePasswdByEmail not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -128,38 +184,38 @@ func RegisterUserServer(s grpc.ServiceRegistrar, srv UserServer) {
 	s.RegisterService(&User_ServiceDesc, srv)
 }
 
-func _User_CheckMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckMobileRequest)
+func _User_RegisterByMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterByMobileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).CheckMobile(ctx, in)
+		return srv.(UserServer).RegisterByMobile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.v1.user.User/CheckMobile",
+		FullMethod: "/api.v1.user.User/RegisterByMobile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).CheckMobile(ctx, req.(*CheckMobileRequest))
+		return srv.(UserServer).RegisterByMobile(ctx, req.(*RegisterByMobileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterRequest)
+func _User_RegisterByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterByEmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).Register(ctx, in)
+		return srv.(UserServer).RegisterByEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.v1.user.User/Register",
+		FullMethod: "/api.v1.user.User/RegisterByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Register(ctx, req.(*RegisterRequest))
+		return srv.(UserServer).RegisterByEmail(ctx, req.(*RegisterByEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -182,38 +238,92 @@ func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetVerifyCodeRequest)
+func _User_GetImageVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetVerifyCode(ctx, in)
+		return srv.(UserServer).GetImageVerifyCode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.v1.user.User/GetVerifyCode",
+		FullMethod: "/api.v1.user.User/GetImageVerifyCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetVerifyCode(ctx, req.(*GetVerifyCodeRequest))
+		return srv.(UserServer).GetImageVerifyCode(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_ResetPassWd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResetPassWdRequest)
+func _User_SendMobileVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendMobileVerifyCodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).ResetPassWd(ctx, in)
+		return srv.(UserServer).SendMobileVerifyCode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.v1.user.User/ResetPassWd",
+		FullMethod: "/api.v1.user.User/SendMobileVerifyCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).ResetPassWd(ctx, req.(*ResetPassWdRequest))
+		return srv.(UserServer).SendMobileVerifyCode(ctx, req.(*SendMobileVerifyCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetEmailVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEmailVerifyCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetEmailVerifyCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/GetEmailVerifyCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetEmailVerifyCode(ctx, req.(*SendEmailVerifyCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ChangePasswdByMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswdByMobileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ChangePasswdByMobile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/ChangePasswdByMobile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ChangePasswdByMobile(ctx, req.(*ChangePasswdByMobileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ChangePasswdByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswdByEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ChangePasswdByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/ChangePasswdByEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ChangePasswdByEmail(ctx, req.(*ChangePasswdByEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -226,24 +336,36 @@ var User_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CheckMobile",
-			Handler:    _User_CheckMobile_Handler,
+			MethodName: "RegisterByMobile",
+			Handler:    _User_RegisterByMobile_Handler,
 		},
 		{
-			MethodName: "Register",
-			Handler:    _User_Register_Handler,
+			MethodName: "RegisterByEmail",
+			Handler:    _User_RegisterByEmail_Handler,
 		},
 		{
 			MethodName: "Login",
 			Handler:    _User_Login_Handler,
 		},
 		{
-			MethodName: "GetVerifyCode",
-			Handler:    _User_GetVerifyCode_Handler,
+			MethodName: "GetImageVerifyCode",
+			Handler:    _User_GetImageVerifyCode_Handler,
 		},
 		{
-			MethodName: "ResetPassWd",
-			Handler:    _User_ResetPassWd_Handler,
+			MethodName: "SendMobileVerifyCode",
+			Handler:    _User_SendMobileVerifyCode_Handler,
+		},
+		{
+			MethodName: "GetEmailVerifyCode",
+			Handler:    _User_GetEmailVerifyCode_Handler,
+		},
+		{
+			MethodName: "ChangePasswdByMobile",
+			Handler:    _User_ChangePasswdByMobile_Handler,
+		},
+		{
+			MethodName: "ChangePasswdByEmail",
+			Handler:    _User_ChangePasswdByEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

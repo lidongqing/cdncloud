@@ -21,10 +21,10 @@ func NewUserLogic(userRepo facade.UserRepo) *UserLogic {
 	}
 }
 
-// 用户注册
-func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string, passwd string, code string) (userId int64, err error) {
-	// 校验验证码
-	codeRes, err := ul.CheckCode(ctx, code)
+// 手机号注册
+func (ul *UserLogic) RegisterByMobile(ctx *context.Context, mobilePre string, mobile string, passwd string, code string) (userId int64, err error) {
+	// 校验手机验证码
+	codeRes, err := ul.CheckMobileCode(ctx, mobile, code)
 	if err != nil {
 		return 0, err
 	}
@@ -32,39 +32,17 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 		return 0, errors.New("验证码错误")
 	}
 
-	userName := ""
 	// 检查手机号是否可用
-	if mobile != "" {
-		isAvail, err := ul.CheckMobile(ctx, mobile)
-		if err != nil {
-			return 0, err
-		}
-		if !isAvail {
-			return 0, errors.New("手机号已存在")
-		}
-		userName = mobile
+	isAvail, err := ul.CheckMobile(ctx, mobile)
+	if err != nil {
+		return 0, err
+	}
+	if !isAvail {
+		return 0, errors.New("手机号已存在")
 	}
 
-	// 检查邮箱是否可用
-	if email != "" {
-		isAvail, err := ul.CheckEmail(ctx, email)
-		if err != nil {
-			return 0, err
-		}
-		if !isAvail {
-			return 0, errors.New("邮箱已存在")
-		}
-		userName = email
-	}
-
-	//随机生成6位包含数字大小写字母的字符串，作为salt
-	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-	rand.Seed(time.Now().UnixNano())
-	b := make([]rune, 6)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	salt := string(b)
+	// 生成密码盐
+	salt, _ := ul.GenerateSalt(ctx)
 
 	// 密码明文加密
 	passwd, err = ul.EncryptPasswd(ctx, passwd, salt)
@@ -74,9 +52,50 @@ func (ul *UserLogic) Register(ctx *context.Context, email string, mobile string,
 
 	// 保存用户信息
 	user := &model.User{
-		Username: userName,
+		Username:  mobile,
+		MobilePre: mobilePre,
+		Mobile:    mobile,
+		Password:  passwd,
+		Salt:      salt,
+		Status:    model.USER_STATUS_NORMAL,
+	}
+	userId, err = ul.userRepo.Save(ctx, user)
+	return
+}
+
+// 邮箱注册
+func (ul *UserLogic) RegisterByEmail(ctx *context.Context, email string, passwd string, code string) (userId int64, err error) {
+	// 校验邮箱验证码
+	codeRes, err := ul.CheckEmailCode(ctx, email, code)
+	if err != nil {
+		return 0, err
+	}
+	if !codeRes {
+		return 0, errors.New("验证码错误")
+	}
+
+	// 检查邮箱是否可用
+	isAvail, err := ul.CheckEmail(ctx, email)
+	if err != nil {
+		return 0, err
+	}
+	if !isAvail {
+		return 0, errors.New("邮箱已存在")
+	}
+
+	// 生成密码盐
+	salt, _ := ul.GenerateSalt(ctx)
+
+	// 密码明文加密
+	passwd, err = ul.EncryptPasswd(ctx, passwd, salt)
+	if err != nil {
+		return 0, err
+	}
+
+	// 保存用户信息
+	user := &model.User{
+		Username: email,
 		Email:    email,
-		Mobile:   mobile,
 		Password: passwd,
 		Salt:     salt,
 		Status:   model.USER_STATUS_NORMAL,
@@ -206,6 +225,94 @@ func (ul *UserLogic) UpdateLoginFailCount(ctx *context.Context, userId int64, re
 	return failNum, nil
 }
 
+// 手机号修改密码
+func (ul *UserLogic) ChangePasswdByMobile(ctx *context.Context, mobile string, passwd string, code string) (success bool, err error) {
+	// 校验手机验证码
+	codeRes, err := ul.CheckMobileCode(ctx, mobile, code)
+	if err != nil {
+		return false, err
+	}
+	if !codeRes {
+		return false, errors.New("验证码错误")
+	}
+
+	// 检查手机号是否存在
+	user, err := ul.userRepo.GetUserInfoByMobile(ctx, mobile)
+	if err != nil {
+		return false, err
+	}
+	if user.Id == 0 {
+		return false, errors.New("用户不存在")
+	}
+
+	// 生成密码盐
+	salt, _ := ul.GenerateSalt(ctx)
+
+	// 密码明文加密
+	passwd, err = ul.EncryptPasswd(ctx, passwd, salt)
+	if err != nil {
+		return false, err
+	}
+
+	// 更新密码
+	_, err = ul.userRepo.UpdatePasswd(ctx, user.Id, passwd)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// 邮箱修改密码
+func (ul *UserLogic) ChangePasswdByEmail(ctx *context.Context, email string, passwd string, code string) (success bool, err error) {
+	// 校验邮箱验证码
+	codeRes, err := ul.CheckEmailCode(ctx, email, code)
+	if err != nil {
+		return false, err
+	}
+	if !codeRes {
+		return false, errors.New("验证码错误")
+	}
+
+	// 检查邮箱是否存在
+	user, err := ul.userRepo.GetUserInfoByEmail(ctx, email)
+	if err != nil {
+		return false, err
+	}
+	if user.Id == 0 {
+		return false, errors.New("用户不存在")
+	}
+
+	// 生成密码盐
+	salt, _ := ul.GenerateSalt(ctx)
+
+	// 密码明文加密
+	passwd, err = ul.EncryptPasswd(ctx, passwd, salt)
+	if err != nil {
+		return false, err
+	}
+
+	// 更新密码
+	_, err = ul.userRepo.UpdatePasswd(ctx, user.Id, passwd)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+
+}
+
+// 生成密码盐
+func (ul *UserLogic) GenerateSalt(ctx *context.Context) (salt string, err error) {
+	//随机生成6位包含数字大小写字母的字符串，作为salt
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, 6)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	salt = string(b)
+	return
+}
+
 // 检查手机号是否可用
 func (ul *UserLogic) CheckMobile(ctx *context.Context, mobile string) (bool, error) {
 	user, err := ul.userRepo.GetUserInfoByMobile(ctx, mobile)
@@ -230,7 +337,12 @@ func (ul *UserLogic) CheckEmail(ctx *context.Context, email string) (bool, error
 	return true, nil
 }
 
-// 校验验证码
+// 生成图片验证码
+func (ul *UserLogic) GenerateImageCode(ctx *context.Context) (string, error) {
+	return "", nil
+}
+
+// 校验图片验证码
 func (ul *UserLogic) CheckCode(ctx *context.Context, code string) (bool, error) {
 	return true, nil
 }
@@ -250,7 +362,17 @@ func (ul *UserLogic) SendMobileCode(ctx *context.Context, mobile string) (bool, 
 	return true, nil
 }
 
+// 校验手机验证码
+func (ul *UserLogic) CheckMobileCode(ctx *context.Context, mobile string, code string) (bool, error) {
+	return true, nil
+}
+
 // 发送邮箱验证码
 func (ul *UserLogic) SendEmailCode(ctx *context.Context, email string) (bool, error) {
+	return true, nil
+}
+
+// 校验邮箱验证码
+func (ul *UserLogic) CheckEmailCode(ctx *context.Context, email string, code string) (bool, error) {
 	return true, nil
 }

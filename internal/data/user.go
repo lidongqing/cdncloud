@@ -70,3 +70,13 @@ func (r *userRepo) UpdateLoginFailCount(ctx *context.Context, userId int64, fail
 	}
 	return true, nil
 }
+
+// 更新密码
+func (r *userRepo) UpdatePasswd(ctx *context.Context, userId int64, passwd string) (success bool, err error) {
+	db := r.data.DataBase
+	err = db.Model(&model.User{}).Where("id = ?", userId).Update("password", passwd).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

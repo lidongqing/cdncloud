@@ -14,4 +14,5 @@ type UserRepo interface {
 	GetUserInfoByEmail(ctx *context.Context, email string) (user *userModel.User, err error)
 	GetUserInfoByMobile(ctx *context.Context, mobile string) (user *userModel.User, err error)
 	UpdateLoginFailCount(ctx *context.Context, userId int64, failNum int64) (success bool, err error)
+	UpdatePasswd(ctx *context.Context, userId int64, passwd string) (success bool, err error)
 }

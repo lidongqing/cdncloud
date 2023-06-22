@@ -6,17 +6,17 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /api/user/checkMobile:
+    /api/user/changePasswdByEmail:
         post:
             tags:
                 - User
-            description: Sends a greeting
-            operationId: User_CheckMobile
+            description: 通过邮箱修改密码
+            operationId: User_ChangePasswdByEmail
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.user.CheckMobileRequest'
+                            $ref: '#/components/schemas/api.v1.user.ChangePasswdByEmailRequest'
                 required: true
             responses:
                 "200":
@@ -24,23 +24,44 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.user.CheckMobileReply'
-    /api/user/getVerifyCode:
-        get:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/changePasswdByMobile:
+        post:
             tags:
                 - User
-            operationId: User_GetVerifyCode
+            description: 通过手机修改密码
+            operationId: User_ChangePasswdByMobile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.ChangePasswdByMobileRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.user.GetVerifyCodeReply'
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/getImageVerifyCode:
+        get:
+            tags:
+                - User
+            description: 获取图片验证码
+            operationId: User_GetImageVerifyCode
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetImageVerifyCodeReply'
     /api/user/login:
         post:
             tags:
                 - User
+            description: 登录
             operationId: User_Login
             requestBody:
                 content:
@@ -54,17 +75,18 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.user.LoginReply'
-    /api/user/register:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/registerByEmail:
         post:
             tags:
                 - User
-            operationId: User_Register
+            description: 邮箱注册
+            operationId: User_RegisterByEmail
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.user.RegisterRequest'
+                            $ref: '#/components/schemas/api.v1.user.RegisterByEmailRequest'
                 required: true
             responses:
                 "200":
@@ -73,16 +95,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.RegisterReply'
-    /api/user/resetPasswd:
+    /api/user/registerByMobile:
         post:
             tags:
                 - User
-            operationId: User_ResetPassWd
+            description: 手机号注册
+            operationId: User_RegisterByMobile
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.user.ResetPassWdRequest'
+                            $ref: '#/components/schemas/api.v1.user.RegisterByMobileRequest'
                 required: true
             responses:
                 "200":
@@ -90,7 +113,45 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.user.ResetPassWdReply'
+                                $ref: '#/components/schemas/api.v1.user.RegisterReply'
+    /api/user/sendEmailVerifyCode:
+        post:
+            tags:
+                - User
+            description: 发送邮箱验证码
+            operationId: User_GetEmailVerifyCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.SendEmailVerifyCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/sendMobileVerifyCode:
+        post:
+            tags:
+                - User
+            description: 发送手机验证码
+            operationId: User_SendMobileVerifyCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.SendMobileVerifyCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
     /helloworld/{name}:
         get:
             tags:
@@ -112,26 +173,36 @@ paths:
                                 $ref: '#/components/schemas/helloworld.v1.HelloReply'
 components:
     schemas:
-        api.v1.user.CheckMobileReply:
+        api.v1.user.ChangePasswdByEmailRequest:
             type: object
             properties:
-                isAvail:
-                    type: boolean
-        api.v1.user.CheckMobileRequest:
+                email:
+                    type: string
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.ChangePasswdByMobileRequest:
             type: object
             properties:
                 mobile:
                     type: string
-        api.v1.user.GetVerifyCodeReply:
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.EmptyReply:
+            type: object
+            properties: {}
+        api.v1.user.GetImageVerifyCodeReply:
             type: object
             properties:
                 url:
                     type: string
-        api.v1.user.LoginReply:
-            type: object
-            properties:
-                isLogin:
-                    type: boolean
         api.v1.user.LoginRequest:
             type: object
             properties:
@@ -143,42 +214,45 @@ components:
                     type: string
                 code:
                     type: string
+        api.v1.user.RegisterByEmailRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.RegisterByMobileRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                mobilePre:
+                    type: string
+                password:
+                    type: string
+                repassword:
+                    type: string
+                code:
+                    type: string
         api.v1.user.RegisterReply:
             type: object
             properties:
                 userId:
                     type: integer
                     format: int64
-        api.v1.user.RegisterRequest:
+        api.v1.user.SendEmailVerifyCodeRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+        api.v1.user.SendMobileVerifyCodeRequest:
             type: object
             properties:
                 mobile:
-                    type: string
-                email:
-                    type: string
-                password:
-                    type: string
-                repassword:
-                    type: string
-                code:
-                    type: string
-        api.v1.user.ResetPassWdReply:
-            type: object
-            properties:
-                isReset:
-                    type: boolean
-        api.v1.user.ResetPassWdRequest:
-            type: object
-            properties:
-                mobile:
-                    type: string
-                email:
-                    type: string
-                password:
-                    type: string
-                repassword:
-                    type: string
-                code:
                     type: string
         helloworld.v1.HelloReply:
             type: object
@@ -190,4 +264,3 @@ tags:
     - name: Greeter
       description: The greeting service definition.
     - name: User
-      description: The greeting service definition.
