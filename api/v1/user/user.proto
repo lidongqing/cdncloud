@@ -99,10 +99,9 @@ message RegisterByEmailRequest {
 }
 
 message LoginRequest {
-  string mobile = 1;
-  string email = 2;
-  string password = 3;
-  string code = 4;
+  string userName = 1;
+  string password = 2;
+  string code = 3;
 }
 
 message GetImageVerifyCodeReply {

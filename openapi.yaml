@@ -206,9 +206,7 @@ components:
         api.v1.user.LoginRequest:
             type: object
             properties:
-                mobile:
-                    type: string
-                email:
+                userName:
                     type: string
                 password:
                     type: string
