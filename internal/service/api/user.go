@@ -137,3 +137,9 @@ func (s *UserService) SendEmailVerifyCode(ctx context.Context, in *user.SendEmai
 	_, err := s.ul.SendEmailCode(&ctx, in.Email)
 	return &user.EmptyReply{}, err
 }
+
+// 获取账户信息
+func (s *UserService) GetAccountInfo(ctx context.Context, in *user.EmptyRequest) (*user.GetAccountInfoReply, error) {
+	userInfo, err := s.ul.GetAccountInfo(&ctx, 0)
+	return userInfo, err
+}

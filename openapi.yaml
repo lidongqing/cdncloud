@@ -44,6 +44,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/getAccountInfo:
+        get:
+            tags:
+                - User
+            description: 账户信息
+            operationId: User_GetAccountInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetAccountInfoReply'
     /api/user/getImageVerifyCode:
         get:
             tags:
@@ -198,6 +211,22 @@ components:
         api.v1.user.EmptyReply:
             type: object
             properties: {}
+        api.v1.user.GetAccountInfoReply:
+            type: object
+            properties:
+                userId:
+                    type: integer
+                    format: int64
+                userName:
+                    type: string
+                avatar:
+                    type: string
+                money:
+                    type: number
+                    format: float
+                cybermoney:
+                    type: number
+                    format: float
         api.v1.user.GetImageVerifyCodeReply:
             type: object
             properties:

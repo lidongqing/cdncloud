@@ -63,14 +63,12 @@ service User {
       body: "*"
     };
   }
-}
-
-message CheckMobileRequest {
-  string mobile = 1;
-}
-
-message CheckMobileReply {
-  bool is_avail = 1;
+  // 账户信息
+  rpc GetAccountInfo (EmptyRequest) returns (GetAccountInfoReply) {
+    option (google.api.http) = {
+      get: "/api/user/getAccountInfo"
+    };
+  }
 }
 
 message EmptyRequest {
@@ -128,4 +126,12 @@ message ChangePasswdByEmailRequest {
   string password = 3;
   string repassword = 4;
   string code = 5;
+}
+
+message GetAccountInfoReply{
+  int64 userId = 1;
+  string userName = 2;
+  string avatar = 3;
+  float money = 4;
+  float cybermoney = 5;
 }

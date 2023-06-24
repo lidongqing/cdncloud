@@ -19,6 +19,7 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationUserChangePasswdByEmail = "/api.v1.user.User/ChangePasswdByEmail"
 const OperationUserChangePasswdByMobile = "/api.v1.user.User/ChangePasswdByMobile"
+const OperationUserGetAccountInfo = "/api.v1.user.User/GetAccountInfo"
 const OperationUserGetEmailVerifyCode = "/api.v1.user.User/GetEmailVerifyCode"
 const OperationUserGetImageVerifyCode = "/api.v1.user.User/GetImageVerifyCode"
 const OperationUserLogin = "/api.v1.user.User/Login"
@@ -29,6 +30,7 @@ const OperationUserSendMobileVerifyCode = "/api.v1.user.User/SendMobileVerifyCod
 type UserHTTPServer interface {
 	ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error)
 	ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error)
+	GetAccountInfo(context.Context, *EmptyRequest) (*GetAccountInfoReply, error)
 	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error)
 	Login(context.Context, *LoginRequest) (*EmptyReply, error)
@@ -47,6 +49,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/api/user/sendEmailVerifyCode", _User_GetEmailVerifyCode0_HTTP_Handler(srv))
 	r.POST("/api/user/changePasswdByMobile", _User_ChangePasswdByMobile0_HTTP_Handler(srv))
 	r.POST("/api/user/changePasswdByEmail", _User_ChangePasswdByEmail0_HTTP_Handler(srv))
+	r.GET("/api/user/getAccountInfo", _User_GetAccountInfo0_HTTP_Handler(srv))
 }
 
 func _User_RegisterByMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -201,9 +204,29 @@ func _User_ChangePasswdByEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.C
 	}
 }
 
+func _User_GetAccountInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EmptyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserGetAccountInfo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetAccountInfo(ctx, req.(*EmptyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetAccountInfoReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	ChangePasswdByEmail(ctx context.Context, req *ChangePasswdByEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ChangePasswdByMobile(ctx context.Context, req *ChangePasswdByMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	GetAccountInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetAccountInfoReply, err error)
 	GetEmailVerifyCode(ctx context.Context, req *SendEmailVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetImageVerifyCode(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetImageVerifyCodeReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
@@ -240,6 +263,19 @@ func (c *UserHTTPClientImpl) ChangePasswdByMobile(ctx context.Context, in *Chang
 	opts = append(opts, http.Operation(OperationUserChangePasswdByMobile))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) GetAccountInfo(ctx context.Context, in *EmptyRequest, opts ...http.CallOption) (*GetAccountInfoReply, error) {
+	var out GetAccountInfoReply
+	pattern := "/api/user/getAccountInfo"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserGetAccountInfo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

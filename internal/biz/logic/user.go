@@ -1,6 +1,7 @@
 package logic
 
 import (
+	v1User "cdncloud/api/v1/user"
 	"cdncloud/internal/biz/facade"
 	"cdncloud/internal/model"
 	"context"
@@ -375,4 +376,33 @@ func (ul *UserLogic) SendEmailCode(ctx *context.Context, email string) (bool, er
 // 校验邮箱验证码
 func (ul *UserLogic) CheckEmailCode(ctx *context.Context, email string, code string) (bool, error) {
 	return true, nil
+}
+
+// session读取用户id
+func (ul *UserLogic) GetUserIdBySession(ctx *context.Context) (userId int64, err error) {
+	return 108262, nil
+}
+
+// 获取用户信息
+func (ul *UserLogic) GetAccountInfo(ctx *context.Context, userId int64) (user *v1User.GetAccountInfoReply, err error) {
+	if userId == 0 {
+		userId, err = ul.GetUserIdBySession(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	userData, err := ul.userRepo.GetUserInfoById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1User.GetAccountInfoReply{
+		UserId:     userData.Id,
+		UserName:   userData.Username,
+		Avatar:     userData.Avatar,
+		Money:      userData.Money,
+		Cybermoney: userData.Cybermoney,
+	}, nil
+
 }

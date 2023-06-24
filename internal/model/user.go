@@ -17,8 +17,8 @@ type User struct {
 	Gender            int64      `gorm:"column:gender;not null;default:0;comment:'性别'"`
 	Birthday          *time.Time `gorm:"column:birthday;type:date;comment:'生日'"`
 	Bio               string     `gorm:"column:bio;type:varchar(100);charset:utf8mb4;not null;default:'';comment:'格言'"`
-	Money             float64    `gorm:"column:money;type:decimal(12,2);not null;default:0.00;comment:'余额'"`
-	Cybermoney        float64    `gorm:"column:cybermoney;type:decimal(12,2);not null;default:0.00;comment:'虚拟货币'"`
+	Money             float32    `gorm:"column:money;type:decimal(12,2);not null;default:0.00;comment:'余额'"`
+	Cybermoney        float32    `gorm:"column:cybermoney;type:decimal(12,2);not null;default:0.00;comment:'虚拟货币'"`
 	Prevtime          int64      `gorm:"column:prevtime;type:int;comment:'上次登录时间'"`
 	Logintime         int64      `gorm:"column:logintime;type:int;comment:'登录时间'"`
 	Loginip           string     `gorm:"column:loginip;type:varchar(50);charset:utf8mb4;not null;default:'';comment:'登录IP'"`
