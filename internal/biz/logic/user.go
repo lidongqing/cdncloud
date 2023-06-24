@@ -426,3 +426,22 @@ func (ul *UserLogic) SaveUserPersonInfo(ctx *context.Context, name string, card 
 	}
 	return ul.userPersonRepo.Save(ctx, userPerson)
 }
+
+// 获取用户认证信息
+func (ul *UserLogic) GetUserPersonInfo(ctx *context.Context) (user *v1User.GetUserPersonAuthReply, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	userPersonInfo, err := ul.userPersonRepo.GetUserPersonInfoById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1User.GetUserPersonAuthReply{
+		Name:      userPersonInfo.Name,
+		Card:      userPersonInfo.Card,
+		Mobile:    userPersonInfo.Mobile,
+		MobilePre: userPersonInfo.MobilePre,
+		Status:    userPersonInfo.Status,
+	}, nil
+}

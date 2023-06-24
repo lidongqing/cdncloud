@@ -40,8 +40,10 @@ type UserClient interface {
 	ChangePasswdByEmail(ctx context.Context, in *ChangePasswdByEmailRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 账户信息
 	GetAccountInfo(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetAccountInfoReply, error)
-	// 个人认证
+	// 个人认证提交
 	UserPersonAuth(ctx context.Context, in *UserPersonAuthRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 个人认证信息
+	GetUserPersonAuthInfo(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetUserPersonAuthReply, error)
 }
 
 type userClient struct {
@@ -142,6 +144,15 @@ func (c *userClient) UserPersonAuth(ctx context.Context, in *UserPersonAuthReque
 	return out, nil
 }
 
+func (c *userClient) GetUserPersonAuthInfo(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetUserPersonAuthReply, error) {
+	out := new(GetUserPersonAuthReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetUserPersonAuthInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -164,8 +175,10 @@ type UserServer interface {
 	ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error)
 	// 账户信息
 	GetAccountInfo(context.Context, *EmptyRequest) (*GetAccountInfoReply, error)
-	// 个人认证
+	// 个人认证提交
 	UserPersonAuth(context.Context, *UserPersonAuthRequest) (*EmptyReply, error)
+	// 个人认证信息
+	GetUserPersonAuthInfo(context.Context, *EmptyRequest) (*GetUserPersonAuthReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -202,6 +215,9 @@ func (UnimplementedUserServer) GetAccountInfo(context.Context, *EmptyRequest) (*
 }
 func (UnimplementedUserServer) UserPersonAuth(context.Context, *UserPersonAuthRequest) (*EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserPersonAuth not implemented")
+}
+func (UnimplementedUserServer) GetUserPersonAuthInfo(context.Context, *EmptyRequest) (*GetUserPersonAuthReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserPersonAuthInfo not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -396,6 +412,24 @@ func _User_UserPersonAuth_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserPersonAuthInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserPersonAuthInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/GetUserPersonAuthInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserPersonAuthInfo(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -442,6 +476,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserPersonAuth",
 			Handler:    _User_UserPersonAuth_Handler,
+		},
+		{
+			MethodName: "GetUserPersonAuthInfo",
+			Handler:    _User_GetUserPersonAuthInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

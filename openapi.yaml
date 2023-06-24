@@ -70,6 +70,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.GetImageVerifyCodeReply'
+    /api/user/getUserPersonAuthInfo:
+        get:
+            tags:
+                - User
+            description: 个人认证信息
+            operationId: User_GetUserPersonAuthInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetUserPersonAuthReply'
     /api/user/login:
         post:
             tags:
@@ -93,7 +106,7 @@ paths:
         post:
             tags:
                 - User
-            description: 个人认证
+            description: 个人认证提交
             operationId: User_UserPersonAuth
             requestBody:
                 content:
@@ -251,6 +264,20 @@ components:
             properties:
                 url:
                     type: string
+        api.v1.user.GetUserPersonAuthReply:
+            type: object
+            properties:
+                name:
+                    type: string
+                card:
+                    type: string
+                mobile:
+                    type: string
+                mobilePre:
+                    type: string
+                status:
+                    type: integer
+                    format: int64
         api.v1.user.LoginRequest:
             type: object
             properties:

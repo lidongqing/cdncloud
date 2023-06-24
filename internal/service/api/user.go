@@ -158,3 +158,9 @@ func (s *UserService) UserPersonAuth(ctx context.Context, in *user.UserPersonAut
 	_, err := s.ul.SaveUserPersonInfo(&ctx, in.Name, in.Card, in.Mobile, in.MobilePre)
 	return &user.EmptyReply{}, err
 }
+
+// 个人认证信息
+func (s *UserService) GetUserPersonAuthInfo(ctx context.Context, in *user.EmptyRequest) (*user.GetUserPersonAuthReply, error) {
+	userInfo, err := s.ul.GetUserPersonInfo(&ctx)
+	return userInfo, err
+}

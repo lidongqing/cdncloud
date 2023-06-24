@@ -69,11 +69,17 @@ service User {
       get: "/api/user/getAccountInfo"
     };
   }
-  // 个人认证
+  // 个人认证提交
   rpc UserPersonAuth (UserPersonAuthRequest) returns (EmptyReply) {
     option (google.api.http) = {
       post: "/api/user/personalAuth"
       body: "*"
+    };
+  }
+  // 个人认证信息
+  rpc GetUserPersonAuthInfo (EmptyRequest) returns (GetUserPersonAuthReply) {
+    option (google.api.http) = {
+      get: "/api/user/getUserPersonAuthInfo"
     };
   }
 }
@@ -148,4 +154,12 @@ message UserPersonAuthRequest{
   string card = 2;
   string mobile = 3;
   string mobilePre = 4;
+}
+
+message GetUserPersonAuthReply{
+  string name = 1;
+  string card = 2;
+  string mobile = 3;
+  string mobilePre = 4;
+  int64 status = 5;
 }
