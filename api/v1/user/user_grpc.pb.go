@@ -48,6 +48,12 @@ type UserClient interface {
 	UserCompanyAuth(ctx context.Context, in *UserCompanyAuthRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 企业认证信息
 	GetUserCompanyAuthInfo(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetUserCompanyAuthReply, error)
+	// 更新手机号
+	UpdateMobile(ctx context.Context, in *UpdateMobileRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 更新邮箱
+	UpdateEmail(ctx context.Context, in *UpdateEmailRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	// 更新昵称
+	UpdateNickName(ctx context.Context, in *UpdateNickNameRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 推广链接
 	GetPromotionUrl(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPromotionUrlReply, error)
 }
@@ -177,6 +183,33 @@ func (c *userClient) GetUserCompanyAuthInfo(ctx context.Context, in *EmptyReques
 	return out, nil
 }
 
+func (c *userClient) UpdateMobile(ctx context.Context, in *UpdateMobileRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/UpdateMobile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateEmail(ctx context.Context, in *UpdateEmailRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/UpdateEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateNickName(ctx context.Context, in *UpdateNickNameRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/UpdateNickName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetPromotionUrl(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPromotionUrlReply, error) {
 	out := new(GetPromotionUrlReply)
 	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetPromotionUrl", in, out, opts...)
@@ -216,6 +249,12 @@ type UserServer interface {
 	UserCompanyAuth(context.Context, *UserCompanyAuthRequest) (*EmptyReply, error)
 	// 企业认证信息
 	GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error)
+	// 更新手机号
+	UpdateMobile(context.Context, *UpdateMobileRequest) (*EmptyReply, error)
+	// 更新邮箱
+	UpdateEmail(context.Context, *UpdateEmailRequest) (*EmptyReply, error)
+	// 更新昵称
+	UpdateNickName(context.Context, *UpdateNickNameRequest) (*EmptyReply, error)
 	// 推广链接
 	GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error)
 	mustEmbedUnimplementedUserServer()
@@ -263,6 +302,15 @@ func (UnimplementedUserServer) UserCompanyAuth(context.Context, *UserCompanyAuth
 }
 func (UnimplementedUserServer) GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserCompanyAuthInfo not implemented")
+}
+func (UnimplementedUserServer) UpdateMobile(context.Context, *UpdateMobileRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMobile not implemented")
+}
+func (UnimplementedUserServer) UpdateEmail(context.Context, *UpdateEmailRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateEmail not implemented")
+}
+func (UnimplementedUserServer) UpdateNickName(context.Context, *UpdateNickNameRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNickName not implemented")
 }
 func (UnimplementedUserServer) GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPromotionUrl not implemented")
@@ -514,6 +562,60 @@ func _User_GetUserCompanyAuthInfo_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMobileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateMobile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/UpdateMobile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateMobile(ctx, req.(*UpdateMobileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/UpdateEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateEmail(ctx, req.(*UpdateEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateNickName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNickNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateNickName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/UpdateNickName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateNickName(ctx, req.(*UpdateNickNameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetPromotionUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
@@ -590,6 +692,18 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserCompanyAuthInfo",
 			Handler:    _User_GetUserCompanyAuthInfo_Handler,
+		},
+		{
+			MethodName: "UpdateMobile",
+			Handler:    _User_UpdateMobile_Handler,
+		},
+		{
+			MethodName: "UpdateEmail",
+			Handler:    _User_UpdateEmail_Handler,
+		},
+		{
+			MethodName: "UpdateNickName",
+			Handler:    _User_UpdateNickName_Handler,
 		},
 		{
 			MethodName: "GetPromotionUrl",

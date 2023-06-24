@@ -80,3 +80,37 @@ func (r *userRepo) UpdatePasswd(ctx *context.Context, userId int64, passwd strin
 	}
 	return true, nil
 }
+
+// 更新手机号
+func (r *userRepo) UpdateMobile(ctx *context.Context, userId int64, mobile string, mobilePre string) (success bool, err error) {
+	db := r.data.DataBase
+	dataset := &model.User{
+		Mobile:    mobile,
+		MobilePre: mobilePre,
+	}
+	err = db.Model(&model.User{}).Where("id = ?", userId).Updates(dataset).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// 更新邮箱
+func (r *userRepo) UpdateEmail(ctx *context.Context, userId int64, email string) (success bool, err error) {
+	db := r.data.DataBase
+	err = db.Model(&model.User{}).Where("id = ?", userId).Update("email", email).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// 更新昵称
+func (r *userRepo) UpdateNickName(ctx *context.Context, userId int64, nickName string) (success bool, err error) {
+	db := r.data.DataBase
+	err = db.Model(&model.User{}).Where("id = ?", userId).Update("nickname", nickName).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

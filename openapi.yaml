@@ -242,6 +242,63 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/updateEmail:
+        post:
+            tags:
+                - User
+            description: 更新邮箱
+            operationId: User_UpdateEmail
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.UpdateEmailRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/updateMobile:
+        post:
+            tags:
+                - User
+            description: 更新手机号
+            operationId: User_UpdateMobile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.UpdateMobileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/updateNickName:
+        post:
+            tags:
+                - User
+            description: 更新昵称
+            operationId: User_UpdateNickName
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.UpdateNickNameRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
     /helloworld/{name}:
         get:
             tags:
@@ -394,6 +451,27 @@ components:
             type: object
             properties:
                 mobile:
+                    type: string
+        api.v1.user.UpdateEmailRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.UpdateMobileRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                mobilePre:
+                    type: string
+                code:
+                    type: string
+        api.v1.user.UpdateNickNameRequest:
+            type: object
+            properties:
+                nickName:
                     type: string
         api.v1.user.UserCompanyAuthRequest:
             type: object

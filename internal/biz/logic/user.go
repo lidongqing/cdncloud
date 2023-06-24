@@ -410,7 +410,6 @@ func (ul *UserLogic) GetAccountInfo(ctx *context.Context, userId int64) (user *v
 		Money:      userData.Money,
 		Cybermoney: userData.Cybermoney,
 	}, nil
-
 }
 
 // 保存用户认证信息
@@ -501,6 +500,81 @@ func (ul *UserLogic) GetUserCompanyInfo(ctx *context.Context) (user *v1User.GetU
 		Address: userCompanyInfo.Address,
 		Status:  userCompanyInfo.Status,
 	}, nil
+}
+
+// 更新手机号
+func (ul *UserLogic) UpdateMobile(ctx *context.Context, mobile string, mobilePre string, code string) (success bool, err error) {
+	// 校验手机验证码
+	codeRes, err := ul.CheckMobileCode(ctx, mobile, code)
+	if err != nil {
+		return false, err
+	}
+	if !codeRes {
+		return false, errors.New("验证码错误")
+	}
+
+	// 检查手机号是否可用
+	isAvail, err := ul.CheckMobile(ctx, mobile)
+	if err != nil {
+		return false, err
+	}
+	if !isAvail {
+		return false, errors.New("手机号已存在")
+	}
+
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return false, err
+	}
+	_, err = ul.userRepo.UpdateMobile(ctx, userId, mobile, mobilePre)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// 更新邮箱
+func (ul *UserLogic) UpdateEmail(ctx *context.Context, email string, code string) (success bool, err error) {
+	// 校验邮箱验证码
+	codeRes, err := ul.CheckEmailCode(ctx, email, code)
+	if err != nil {
+		return false, err
+	}
+	if !codeRes {
+		return false, errors.New("验证码错误")
+	}
+
+	// 检查邮箱是否可用
+	isAvail, err := ul.CheckEmail(ctx, email)
+	if err != nil {
+		return false, err
+	}
+	if !isAvail {
+		return false, errors.New("邮箱已存在")
+	}
+
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return false, err
+	}
+	_, err = ul.userRepo.UpdateEmail(ctx, userId, email)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// 更新昵称
+func (ul *UserLogic) UpdateNickName(ctx *context.Context, nickName string) (success bool, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return false, err
+	}
+	_, err = ul.userRepo.UpdateNickName(ctx, userId, nickName)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // 推广链接

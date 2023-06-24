@@ -95,6 +95,27 @@ service User {
       get: "/api/user/getUserCompanyAuthInfo"
     };
   }
+  // 更新手机号
+  rpc UpdateMobile (UpdateMobileRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/updateMobile"
+      body: "*"
+    };
+  }
+  // 更新邮箱
+  rpc UpdateEmail (UpdateEmailRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/updateEmail"
+      body: "*"
+    };
+  }
+  // 更新昵称
+  rpc UpdateNickName (UpdateNickNameRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/updateNickName"
+      body: "*"
+    };
+  }
   // 推广链接
   rpc GetPromotionUrl (EmptyRequest) returns (GetPromotionUrlReply) {
     option (google.api.http) = {
@@ -205,4 +226,19 @@ message GetUserCompanyAuthReply{
 
 message GetPromotionUrlReply{
   string url = 1;
+}
+
+message UpdateMobileRequest{
+  string mobile = 1;
+  string mobilePre = 2;
+  string code = 3;
+}
+
+message UpdateEmailRequest{
+  string email = 1;
+  string code = 2;
+}
+
+message UpdateNickNameRequest{
+  string nickName = 1;
 }

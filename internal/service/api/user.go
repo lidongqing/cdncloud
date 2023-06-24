@@ -195,6 +195,39 @@ func (s *UserService) GetUserCompanyAuthInfo(ctx context.Context, in *user.Empty
 	return userInfo, err
 }
 
+// 更新手机号
+func (s *UserService) UpdateMobile(ctx context.Context, in *user.UpdateMobileRequest) (*user.EmptyReply, error) {
+	if in.Mobile == "" {
+		return nil, errors.New("手机号不能为空")
+	}
+	if in.Code == "" {
+		return nil, errors.New("验证码不能为空")
+	}
+	_, err := s.ul.UpdateMobile(&ctx, in.Mobile, in.MobilePre, in.Code)
+	return &user.EmptyReply{}, err
+}
+
+// 更新邮箱
+func (s *UserService) UpdateEmail(ctx context.Context, in *user.UpdateEmailRequest) (*user.EmptyReply, error) {
+	if in.Email == "" {
+		return nil, errors.New("邮箱不能为空")
+	}
+	if in.Code == "" {
+		return nil, errors.New("验证码不能为空")
+	}
+	_, err := s.ul.UpdateEmail(&ctx, in.Email, in.Code)
+	return &user.EmptyReply{}, err
+}
+
+// 更新昵称
+func (s *UserService) UpdateNickName(ctx context.Context, in *user.UpdateNickNameRequest) (*user.EmptyReply, error) {
+	if in.NickName == "" {
+		return nil, errors.New("昵称不能为空")
+	}
+	_, err := s.ul.UpdateNickName(&ctx, in.NickName)
+	return &user.EmptyReply{}, err
+}
+
 // 推广链接
 func (s *UserService) GetPromotionUrl(ctx context.Context, in *user.EmptyRequest) (*user.GetPromotionUrlReply, error) {
 	url, err := s.ul.GetPromotionUrl(&ctx)

@@ -29,6 +29,9 @@ const OperationUserLogin = "/api.v1.user.User/Login"
 const OperationUserRegisterByEmail = "/api.v1.user.User/RegisterByEmail"
 const OperationUserRegisterByMobile = "/api.v1.user.User/RegisterByMobile"
 const OperationUserSendMobileVerifyCode = "/api.v1.user.User/SendMobileVerifyCode"
+const OperationUserUpdateEmail = "/api.v1.user.User/UpdateEmail"
+const OperationUserUpdateMobile = "/api.v1.user.User/UpdateMobile"
+const OperationUserUpdateNickName = "/api.v1.user.User/UpdateNickName"
 const OperationUserUserCompanyAuth = "/api.v1.user.User/UserCompanyAuth"
 const OperationUserUserPersonAuth = "/api.v1.user.User/UserPersonAuth"
 
@@ -45,6 +48,9 @@ type UserHTTPServer interface {
 	RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error)
 	RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error)
 	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
+	UpdateEmail(context.Context, *UpdateEmailRequest) (*EmptyReply, error)
+	UpdateMobile(context.Context, *UpdateMobileRequest) (*EmptyReply, error)
+	UpdateNickName(context.Context, *UpdateNickNameRequest) (*EmptyReply, error)
 	UserCompanyAuth(context.Context, *UserCompanyAuthRequest) (*EmptyReply, error)
 	UserPersonAuth(context.Context, *UserPersonAuthRequest) (*EmptyReply, error)
 }
@@ -64,6 +70,9 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/api/user/getUserPersonAuthInfo", _User_GetUserPersonAuthInfo0_HTTP_Handler(srv))
 	r.POST("/api/user/companyAuth", _User_UserCompanyAuth0_HTTP_Handler(srv))
 	r.GET("/api/user/getUserCompanyAuthInfo", _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv))
+	r.POST("/api/user/updateMobile", _User_UpdateMobile0_HTTP_Handler(srv))
+	r.POST("/api/user/updateEmail", _User_UpdateEmail0_HTTP_Handler(srv))
+	r.POST("/api/user/updateNickName", _User_UpdateNickName0_HTTP_Handler(srv))
 	r.GET("/api/user/getPromotionUrl", _User_GetPromotionUrl0_HTTP_Handler(srv))
 }
 
@@ -314,6 +323,63 @@ func _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx htt
 	}
 }
 
+func _User_UpdateMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateMobileRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUpdateMobile)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateMobile(ctx, req.(*UpdateMobileRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EmptyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_UpdateEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateEmailRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUpdateEmail)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateEmail(ctx, req.(*UpdateEmailRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EmptyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_UpdateNickName0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateNickNameRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUpdateNickName)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateNickName(ctx, req.(*UpdateNickNameRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EmptyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _User_GetPromotionUrl0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in EmptyRequest
@@ -346,6 +412,9 @@ type UserHTTPClient interface {
 	RegisterByEmail(ctx context.Context, req *RegisterByEmailRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RegisterByMobile(ctx context.Context, req *RegisterByMobileRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	SendMobileVerifyCode(ctx context.Context, req *SendMobileVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	UpdateEmail(ctx context.Context, req *UpdateEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	UpdateMobile(ctx context.Context, req *UpdateMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	UpdateNickName(ctx context.Context, req *UpdateNickNameRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	UserCompanyAuth(ctx context.Context, req *UserCompanyAuthRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	UserPersonAuth(ctx context.Context, req *UserPersonAuthRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 }
@@ -506,6 +575,45 @@ func (c *UserHTTPClientImpl) SendMobileVerifyCode(ctx context.Context, in *SendM
 	pattern := "/api/user/sendMobileVerifyCode"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserSendMobileVerifyCode))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) UpdateEmail(ctx context.Context, in *UpdateEmailRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/updateEmail"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUpdateEmail))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) UpdateMobile(ctx context.Context, in *UpdateMobileRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/updateMobile"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUpdateMobile))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) UpdateNickName(ctx context.Context, in *UpdateNickNameRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/updateNickName"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUpdateNickName))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
