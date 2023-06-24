@@ -82,6 +82,19 @@ service User {
       get: "/api/user/getUserPersonAuthInfo"
     };
   }
+  // 企业认证提交
+  rpc UserCompanyAuth (UserCompanyAuthRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/companyAuth"
+      body: "*"
+    };
+  }
+  // 企业认证信息
+  rpc GetUserCompanyAuthInfo (EmptyRequest) returns (GetUserCompanyAuthReply) {
+    option (google.api.http) = {
+      get: "/api/user/getUserCompanyAuthInfo"
+    };
+  }
 }
 
 message EmptyRequest {
@@ -162,4 +175,24 @@ message GetUserPersonAuthReply{
   string mobile = 3;
   string mobilePre = 4;
   int64 status = 5;
+}
+
+message UserCompanyAuthRequest{
+  string name = 1;
+  string code = 2;
+  string epreson = 3;
+  string ecard = 4;
+  string phone = 5;
+  string address = 6;
+  string image = 7;
+}
+
+message GetUserCompanyAuthReply{
+  string name = 1;
+  string code = 2;
+  string epreson = 3;
+  string ecard = 4;
+  string phone = 5;
+  string address = 6;
+  int64 status = 7;
 }

@@ -44,6 +44,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/user/companyAuth:
+        post:
+            tags:
+                - User
+            description: 企业认证提交
+            operationId: User_UserCompanyAuth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.user.UserCompanyAuthRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.EmptyReply'
     /api/user/getAccountInfo:
         get:
             tags:
@@ -70,6 +89,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.GetImageVerifyCodeReply'
+    /api/user/getUserCompanyAuthInfo:
+        get:
+            tags:
+                - User
+            description: 企业认证信息
+            operationId: User_GetUserCompanyAuthInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetUserCompanyAuthReply'
     /api/user/getUserPersonAuthInfo:
         get:
             tags:
@@ -264,6 +296,24 @@ components:
             properties:
                 url:
                     type: string
+        api.v1.user.GetUserCompanyAuthReply:
+            type: object
+            properties:
+                name:
+                    type: string
+                code:
+                    type: string
+                epreson:
+                    type: string
+                ecard:
+                    type: string
+                phone:
+                    type: string
+                address:
+                    type: string
+                status:
+                    type: integer
+                    format: int64
         api.v1.user.GetUserPersonAuthReply:
             type: object
             properties:
@@ -326,6 +376,23 @@ components:
             type: object
             properties:
                 mobile:
+                    type: string
+        api.v1.user.UserCompanyAuthRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                code:
+                    type: string
+                epreson:
+                    type: string
+                ecard:
+                    type: string
+                phone:
+                    type: string
+                address:
+                    type: string
+                image:
                     type: string
         api.v1.user.UserPersonAuthRequest:
             type: object

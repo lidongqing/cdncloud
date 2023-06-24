@@ -164,3 +164,30 @@ func (s *UserService) GetUserPersonAuthInfo(ctx context.Context, in *user.EmptyR
 	userInfo, err := s.ul.GetUserPersonInfo(&ctx)
 	return userInfo, err
 }
+
+// 企业认证
+func (s *UserService) UserCompanyAuth(ctx context.Context, in *user.UserCompanyAuthRequest) (*user.EmptyReply, error) {
+	if in.Name == "" {
+		return nil, errors.New("企业名称不能为空")
+	}
+	if in.Code == "" {
+		return nil, errors.New("营业执照号不能为空")
+	}
+	if in.Phone == "" {
+		return nil, errors.New("手机号不能为空")
+	}
+	if in.Ecard == "" {
+		return nil, errors.New("法人身份证号不能为空")
+	}
+	if in.Address == "" {
+		return nil, errors.New("联系地址不能为空")
+	}
+	_, err := s.ul.SaveUserCompanyInfo(&ctx, in)
+	return &user.EmptyReply{}, err
+}
+
+// 企业认证信息
+func (s *UserService) GetUserCompanyAuthInfo(ctx context.Context, in *user.EmptyRequest) (*user.GetUserCompanyAuthReply, error) {
+	userInfo, err := s.ul.GetUserCompanyInfo(&ctx)
+	return userInfo, err
+}

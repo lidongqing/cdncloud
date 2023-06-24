@@ -9,18 +9,21 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/rand"
+	"regexp"
 	"time"
 )
 
 type UserLogic struct {
-	userRepo       facade.UserRepo
-	userPersonRepo facade.UserPersonRepo
+	userRepo        facade.UserRepo
+	userPersonRepo  facade.UserPersonRepo
+	userCompanyRepo facade.UserCompanyRepo
 }
 
-func NewUserLogic(userRepo facade.UserRepo, userPersonRepo facade.UserPersonRepo) *UserLogic {
+func NewUserLogic(userRepo facade.UserRepo, userPersonRepo facade.UserPersonRepo, userCompanyRepo facade.UserCompanyRepo) *UserLogic {
 	return &UserLogic{
-		userRepo:       userRepo,
-		userPersonRepo: userPersonRepo,
+		userRepo:        userRepo,
+		userPersonRepo:  userPersonRepo,
+		userCompanyRepo: userCompanyRepo,
 	}
 }
 
@@ -437,11 +440,64 @@ func (ul *UserLogic) GetUserPersonInfo(ctx *context.Context) (user *v1User.GetUs
 	if err != nil {
 		return nil, err
 	}
+	//隐藏身份证号
+	if userPersonInfo.Card != "" {
+		reg := regexp.MustCompile(`^(\d{4})\d+(\d{4})$`)
+		userPersonInfo.Card = reg.ReplaceAllString(userPersonInfo.Card, "$1***********$2")
+	}
+	//隐藏手机号
+	if userPersonInfo.Mobile != "" {
+		reg := regexp.MustCompile(`^(\d{3})\d+(\d{4})$`)
+		userPersonInfo.Mobile = reg.ReplaceAllString(userPersonInfo.Mobile, "$1****$2")
+	}
 	return &v1User.GetUserPersonAuthReply{
 		Name:      userPersonInfo.Name,
 		Card:      userPersonInfo.Card,
 		Mobile:    userPersonInfo.Mobile,
 		MobilePre: userPersonInfo.MobilePre,
 		Status:    userPersonInfo.Status,
+	}, nil
+}
+
+// 保存用户企业认证信息
+func (ul *UserLogic) SaveUserCompanyInfo(ctx *context.Context, req *v1User.UserCompanyAuthRequest) (id int64, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return 0, err
+	}
+	//@todo:图片上传
+	imageUrl := ""
+	userCompany := &model.UserCompany{
+		UserID:  userId,
+		Name:    req.Name,
+		Code:    req.Code,
+		Epreson: req.Epreson,
+		Ecard:   req.Ecard,
+		Phone:   req.Phone,
+		Address: req.Address,
+		Image:   imageUrl,
+		Status:  model.USER_COMPANY_STATUS_WAIT,
+	}
+	return ul.userCompanyRepo.Save(ctx, userCompany)
+}
+
+// 获取用户企业认证信息
+func (ul *UserLogic) GetUserCompanyInfo(ctx *context.Context) (user *v1User.GetUserCompanyAuthReply, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	userCompanyInfo, err := ul.userCompanyRepo.GetUserCompanyInfoById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1User.GetUserCompanyAuthReply{
+		Name:    userCompanyInfo.Name,
+		Code:    userCompanyInfo.Code,
+		Epreson: userCompanyInfo.Epreson,
+		Ecard:   userCompanyInfo.Ecard,
+		Phone:   userCompanyInfo.Phone,
+		Address: userCompanyInfo.Address,
+		Status:  userCompanyInfo.Status,
 	}, nil
 }

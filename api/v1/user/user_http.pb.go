@@ -22,11 +22,13 @@ const OperationUserChangePasswdByMobile = "/api.v1.user.User/ChangePasswdByMobil
 const OperationUserGetAccountInfo = "/api.v1.user.User/GetAccountInfo"
 const OperationUserGetEmailVerifyCode = "/api.v1.user.User/GetEmailVerifyCode"
 const OperationUserGetImageVerifyCode = "/api.v1.user.User/GetImageVerifyCode"
+const OperationUserGetUserCompanyAuthInfo = "/api.v1.user.User/GetUserCompanyAuthInfo"
 const OperationUserGetUserPersonAuthInfo = "/api.v1.user.User/GetUserPersonAuthInfo"
 const OperationUserLogin = "/api.v1.user.User/Login"
 const OperationUserRegisterByEmail = "/api.v1.user.User/RegisterByEmail"
 const OperationUserRegisterByMobile = "/api.v1.user.User/RegisterByMobile"
 const OperationUserSendMobileVerifyCode = "/api.v1.user.User/SendMobileVerifyCode"
+const OperationUserUserCompanyAuth = "/api.v1.user.User/UserCompanyAuth"
 const OperationUserUserPersonAuth = "/api.v1.user.User/UserPersonAuth"
 
 type UserHTTPServer interface {
@@ -35,11 +37,13 @@ type UserHTTPServer interface {
 	GetAccountInfo(context.Context, *EmptyRequest) (*GetAccountInfoReply, error)
 	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error)
+	GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error)
 	GetUserPersonAuthInfo(context.Context, *EmptyRequest) (*GetUserPersonAuthReply, error)
 	Login(context.Context, *LoginRequest) (*EmptyReply, error)
 	RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error)
 	RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error)
 	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
+	UserCompanyAuth(context.Context, *UserCompanyAuthRequest) (*EmptyReply, error)
 	UserPersonAuth(context.Context, *UserPersonAuthRequest) (*EmptyReply, error)
 }
 
@@ -56,6 +60,8 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/api/user/getAccountInfo", _User_GetAccountInfo0_HTTP_Handler(srv))
 	r.POST("/api/user/personalAuth", _User_UserPersonAuth0_HTTP_Handler(srv))
 	r.GET("/api/user/getUserPersonAuthInfo", _User_GetUserPersonAuthInfo0_HTTP_Handler(srv))
+	r.POST("/api/user/companyAuth", _User_UserCompanyAuth0_HTTP_Handler(srv))
+	r.GET("/api/user/getUserCompanyAuthInfo", _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv))
 }
 
 func _User_RegisterByMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -267,17 +273,57 @@ func _User_GetUserPersonAuthInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http
 	}
 }
 
+func _User_UserCompanyAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UserCompanyAuthRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUserCompanyAuth)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UserCompanyAuth(ctx, req.(*UserCompanyAuthRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EmptyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EmptyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserGetUserCompanyAuthInfo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetUserCompanyAuthInfo(ctx, req.(*EmptyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetUserCompanyAuthReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	ChangePasswdByEmail(ctx context.Context, req *ChangePasswdByEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ChangePasswdByMobile(ctx context.Context, req *ChangePasswdByMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetAccountInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetAccountInfoReply, err error)
 	GetEmailVerifyCode(ctx context.Context, req *SendEmailVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetImageVerifyCode(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetImageVerifyCodeReply, err error)
+	GetUserCompanyAuthInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetUserCompanyAuthReply, err error)
 	GetUserPersonAuthInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetUserPersonAuthReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	RegisterByEmail(ctx context.Context, req *RegisterByEmailRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RegisterByMobile(ctx context.Context, req *RegisterByMobileRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	SendMobileVerifyCode(ctx context.Context, req *SendMobileVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	UserCompanyAuth(ctx context.Context, req *UserCompanyAuthRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	UserPersonAuth(ctx context.Context, req *UserPersonAuthRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 }
 
@@ -354,6 +400,19 @@ func (c *UserHTTPClientImpl) GetImageVerifyCode(ctx context.Context, in *EmptyRe
 	return &out, err
 }
 
+func (c *UserHTTPClientImpl) GetUserCompanyAuthInfo(ctx context.Context, in *EmptyRequest, opts ...http.CallOption) (*GetUserCompanyAuthReply, error) {
+	var out GetUserCompanyAuthReply
+	pattern := "/api/user/getUserCompanyAuthInfo"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserGetUserCompanyAuthInfo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *UserHTTPClientImpl) GetUserPersonAuthInfo(ctx context.Context, in *EmptyRequest, opts ...http.CallOption) (*GetUserPersonAuthReply, error) {
 	var out GetUserPersonAuthReply
 	pattern := "/api/user/getUserPersonAuthInfo"
@@ -411,6 +470,19 @@ func (c *UserHTTPClientImpl) SendMobileVerifyCode(ctx context.Context, in *SendM
 	pattern := "/api/user/sendMobileVerifyCode"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserSendMobileVerifyCode))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) UserCompanyAuth(ctx context.Context, in *UserCompanyAuthRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/companyAuth"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUserCompanyAuth))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
