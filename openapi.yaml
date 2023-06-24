@@ -89,6 +89,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.GetImageVerifyCodeReply'
+    /api/user/getPromotionUrl:
+        get:
+            tags:
+                - User
+            description: 推广链接
+            operationId: User_GetPromotionUrl
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.user.GetPromotionUrlReply'
     /api/user/getUserCompanyAuthInfo:
         get:
             tags:
@@ -296,6 +309,11 @@ components:
             properties:
                 url:
                     type: string
+        api.v1.user.GetPromotionUrlReply:
+            type: object
+            properties:
+                url:
+                    type: string
         api.v1.user.GetUserCompanyAuthReply:
             type: object
             properties:
@@ -394,6 +412,7 @@ components:
                     type: string
                 image:
                     type: string
+                    format: bytes
         api.v1.user.UserPersonAuthRequest:
             type: object
             properties:

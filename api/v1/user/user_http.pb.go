@@ -22,6 +22,7 @@ const OperationUserChangePasswdByMobile = "/api.v1.user.User/ChangePasswdByMobil
 const OperationUserGetAccountInfo = "/api.v1.user.User/GetAccountInfo"
 const OperationUserGetEmailVerifyCode = "/api.v1.user.User/GetEmailVerifyCode"
 const OperationUserGetImageVerifyCode = "/api.v1.user.User/GetImageVerifyCode"
+const OperationUserGetPromotionUrl = "/api.v1.user.User/GetPromotionUrl"
 const OperationUserGetUserCompanyAuthInfo = "/api.v1.user.User/GetUserCompanyAuthInfo"
 const OperationUserGetUserPersonAuthInfo = "/api.v1.user.User/GetUserPersonAuthInfo"
 const OperationUserLogin = "/api.v1.user.User/Login"
@@ -37,6 +38,7 @@ type UserHTTPServer interface {
 	GetAccountInfo(context.Context, *EmptyRequest) (*GetAccountInfoReply, error)
 	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error)
+	GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error)
 	GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error)
 	GetUserPersonAuthInfo(context.Context, *EmptyRequest) (*GetUserPersonAuthReply, error)
 	Login(context.Context, *LoginRequest) (*EmptyReply, error)
@@ -62,6 +64,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/api/user/getUserPersonAuthInfo", _User_GetUserPersonAuthInfo0_HTTP_Handler(srv))
 	r.POST("/api/user/companyAuth", _User_UserCompanyAuth0_HTTP_Handler(srv))
 	r.GET("/api/user/getUserCompanyAuthInfo", _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv))
+	r.GET("/api/user/getPromotionUrl", _User_GetPromotionUrl0_HTTP_Handler(srv))
 }
 
 func _User_RegisterByMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -311,12 +314,32 @@ func _User_GetUserCompanyAuthInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx htt
 	}
 }
 
+func _User_GetPromotionUrl0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EmptyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserGetPromotionUrl)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetPromotionUrl(ctx, req.(*EmptyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetPromotionUrlReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	ChangePasswdByEmail(ctx context.Context, req *ChangePasswdByEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ChangePasswdByMobile(ctx context.Context, req *ChangePasswdByMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetAccountInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetAccountInfoReply, err error)
 	GetEmailVerifyCode(ctx context.Context, req *SendEmailVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetImageVerifyCode(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetImageVerifyCodeReply, err error)
+	GetPromotionUrl(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetPromotionUrlReply, err error)
 	GetUserCompanyAuthInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetUserCompanyAuthReply, err error)
 	GetUserPersonAuthInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetUserPersonAuthReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
@@ -392,6 +415,19 @@ func (c *UserHTTPClientImpl) GetImageVerifyCode(ctx context.Context, in *EmptyRe
 	pattern := "/api/user/getImageVerifyCode"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserGetImageVerifyCode))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) GetPromotionUrl(ctx context.Context, in *EmptyRequest, opts ...http.CallOption) (*GetPromotionUrlReply, error) {
+	var out GetPromotionUrlReply
+	pattern := "/api/user/getPromotionUrl"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserGetPromotionUrl))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

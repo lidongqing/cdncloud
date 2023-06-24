@@ -6,6 +6,7 @@ import (
 	"cdncloud/internal/model"
 	"context"
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"math/rand"
@@ -500,4 +501,16 @@ func (ul *UserLogic) GetUserCompanyInfo(ctx *context.Context) (user *v1User.GetU
 		Address: userCompanyInfo.Address,
 		Status:  userCompanyInfo.Status,
 	}, nil
+}
+
+// 推广链接
+func (ul *UserLogic) GetPromotionUrl(ctx *context.Context) (url string, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return "", err
+	}
+	//将userId转base64encode
+	code := base64.StdEncoding.EncodeToString([]byte(string(userId)))
+	url = "http://cdn.cdncloud.com/index/login/register/t/" + code
+	return url, nil
 }

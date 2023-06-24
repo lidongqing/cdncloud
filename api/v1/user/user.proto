@@ -95,6 +95,12 @@ service User {
       get: "/api/user/getUserCompanyAuthInfo"
     };
   }
+  // 推广链接
+  rpc GetPromotionUrl (EmptyRequest) returns (GetPromotionUrlReply) {
+    option (google.api.http) = {
+      get: "/api/user/getPromotionUrl"
+    };
+  }
 }
 
 message EmptyRequest {
@@ -184,7 +190,7 @@ message UserCompanyAuthRequest{
   string ecard = 4;
   string phone = 5;
   string address = 6;
-  string image = 7;
+  bytes image = 7;
 }
 
 message GetUserCompanyAuthReply{
@@ -195,4 +201,8 @@ message GetUserCompanyAuthReply{
   string phone = 5;
   string address = 6;
   int64 status = 7;
+}
+
+message GetPromotionUrlReply{
+  string url = 1;
 }

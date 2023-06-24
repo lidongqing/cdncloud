@@ -179,6 +179,9 @@ func (s *UserService) UserCompanyAuth(ctx context.Context, in *user.UserCompanyA
 	if in.Ecard == "" {
 		return nil, errors.New("法人身份证号不能为空")
 	}
+	if in.Epreson == "" {
+		return nil, errors.New("法人姓名不能为空")
+	}
 	if in.Address == "" {
 		return nil, errors.New("联系地址不能为空")
 	}
@@ -190,4 +193,12 @@ func (s *UserService) UserCompanyAuth(ctx context.Context, in *user.UserCompanyA
 func (s *UserService) GetUserCompanyAuthInfo(ctx context.Context, in *user.EmptyRequest) (*user.GetUserCompanyAuthReply, error) {
 	userInfo, err := s.ul.GetUserCompanyInfo(&ctx)
 	return userInfo, err
+}
+
+// 推广链接
+func (s *UserService) GetPromotionUrl(ctx context.Context, in *user.EmptyRequest) (*user.GetPromotionUrlReply, error) {
+	url, err := s.ul.GetPromotionUrl(&ctx)
+	return &user.GetPromotionUrlReply{
+		Url: url,
+	}, err
 }

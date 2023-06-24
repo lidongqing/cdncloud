@@ -48,6 +48,8 @@ type UserClient interface {
 	UserCompanyAuth(ctx context.Context, in *UserCompanyAuthRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 企业认证信息
 	GetUserCompanyAuthInfo(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetUserCompanyAuthReply, error)
+	// 推广链接
+	GetPromotionUrl(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPromotionUrlReply, error)
 }
 
 type userClient struct {
@@ -175,6 +177,15 @@ func (c *userClient) GetUserCompanyAuthInfo(ctx context.Context, in *EmptyReques
 	return out, nil
 }
 
+func (c *userClient) GetPromotionUrl(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*GetPromotionUrlReply, error) {
+	out := new(GetPromotionUrlReply)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetPromotionUrl", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -205,6 +216,8 @@ type UserServer interface {
 	UserCompanyAuth(context.Context, *UserCompanyAuthRequest) (*EmptyReply, error)
 	// 企业认证信息
 	GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error)
+	// 推广链接
+	GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -250,6 +263,9 @@ func (UnimplementedUserServer) UserCompanyAuth(context.Context, *UserCompanyAuth
 }
 func (UnimplementedUserServer) GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserCompanyAuthInfo not implemented")
+}
+func (UnimplementedUserServer) GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPromotionUrl not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -498,6 +514,24 @@ func _User_GetUserCompanyAuthInfo_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetPromotionUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetPromotionUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.user.User/GetPromotionUrl",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetPromotionUrl(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -556,6 +590,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserCompanyAuthInfo",
 			Handler:    _User_GetUserCompanyAuthInfo_Handler,
+		},
+		{
+			MethodName: "GetPromotionUrl",
+			Handler:    _User_GetPromotionUrl_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
