@@ -69,6 +69,13 @@ service User {
       get: "/api/user/getAccountInfo"
     };
   }
+  // 个人认证
+  rpc UserPersonAuth (UserPersonAuthRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/user/personalAuth"
+      body: "*"
+    };
+  }
 }
 
 message EmptyRequest {
@@ -134,4 +141,11 @@ message GetAccountInfoReply{
   string avatar = 3;
   float money = 4;
   float cybermoney = 5;
+}
+
+message UserPersonAuthRequest{
+  string name = 1;
+  string card = 2;
+  string mobile = 3;
+  string mobilePre = 4;
 }

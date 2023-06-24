@@ -143,3 +143,18 @@ func (s *UserService) GetAccountInfo(ctx context.Context, in *user.EmptyRequest)
 	userInfo, err := s.ul.GetAccountInfo(&ctx, 0)
 	return userInfo, err
 }
+
+// 个人认证
+func (s *UserService) UserPersonAuth(ctx context.Context, in *user.UserPersonAuthRequest) (*user.EmptyReply, error) {
+	if in.Name == "" {
+		return nil, errors.New("姓名不能为空")
+	}
+	if in.Card == "" {
+		return nil, errors.New("身份证号不能为空")
+	}
+	if in.Mobile == "" {
+		return nil, errors.New("手机号不能为空")
+	}
+	_, err := s.ul.SaveUserPersonInfo(&ctx, in.Name, in.Card, in.Mobile, in.MobilePre)
+	return &user.EmptyReply{}, err
+}

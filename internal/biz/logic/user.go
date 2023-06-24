@@ -13,12 +13,14 @@ import (
 )
 
 type UserLogic struct {
-	userRepo facade.UserRepo
+	userRepo       facade.UserRepo
+	userPersonRepo facade.UserPersonRepo
 }
 
-func NewUserLogic(userRepo facade.UserRepo) *UserLogic {
+func NewUserLogic(userRepo facade.UserRepo, userPersonRepo facade.UserPersonRepo) *UserLogic {
 	return &UserLogic{
-		userRepo: userRepo,
+		userRepo:       userRepo,
+		userPersonRepo: userPersonRepo,
 	}
 }
 
@@ -405,4 +407,22 @@ func (ul *UserLogic) GetAccountInfo(ctx *context.Context, userId int64) (user *v
 		Cybermoney: userData.Cybermoney,
 	}, nil
 
+}
+
+// 保存用户认证信息
+func (ul *UserLogic) SaveUserPersonInfo(ctx *context.Context, name string, card string, mobile string, mobilePre string) (id int64, err error) {
+	userId, err := ul.GetUserIdBySession(ctx)
+	if err != nil {
+		return 0, err
+	}
+	userPerson := &model.UserPerson{
+		UserID:     userId,
+		Name:       name,
+		Card:       card,
+		Mobile:     mobile,
+		MobilePre:  mobilePre,
+		Status:     model.USER_PERSON_STATUS_WAIT,
+		Createdate: time.Now(),
+	}
+	return ul.userPersonRepo.Save(ctx, userPerson)
 }

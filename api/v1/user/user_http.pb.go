@@ -26,6 +26,7 @@ const OperationUserLogin = "/api.v1.user.User/Login"
 const OperationUserRegisterByEmail = "/api.v1.user.User/RegisterByEmail"
 const OperationUserRegisterByMobile = "/api.v1.user.User/RegisterByMobile"
 const OperationUserSendMobileVerifyCode = "/api.v1.user.User/SendMobileVerifyCode"
+const OperationUserUserPersonAuth = "/api.v1.user.User/UserPersonAuth"
 
 type UserHTTPServer interface {
 	ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error)
@@ -37,6 +38,7 @@ type UserHTTPServer interface {
 	RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error)
 	RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error)
 	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
+	UserPersonAuth(context.Context, *UserPersonAuthRequest) (*EmptyReply, error)
 }
 
 func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
@@ -50,6 +52,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/api/user/changePasswdByMobile", _User_ChangePasswdByMobile0_HTTP_Handler(srv))
 	r.POST("/api/user/changePasswdByEmail", _User_ChangePasswdByEmail0_HTTP_Handler(srv))
 	r.GET("/api/user/getAccountInfo", _User_GetAccountInfo0_HTTP_Handler(srv))
+	r.POST("/api/user/personalAuth", _User_UserPersonAuth0_HTTP_Handler(srv))
 }
 
 func _User_RegisterByMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -223,6 +226,25 @@ func _User_GetAccountInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Contex
 	}
 }
 
+func _User_UserPersonAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UserPersonAuthRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUserPersonAuth)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UserPersonAuth(ctx, req.(*UserPersonAuthRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EmptyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	ChangePasswdByEmail(ctx context.Context, req *ChangePasswdByEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ChangePasswdByMobile(ctx context.Context, req *ChangePasswdByMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
@@ -233,6 +255,7 @@ type UserHTTPClient interface {
 	RegisterByEmail(ctx context.Context, req *RegisterByEmailRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RegisterByMobile(ctx context.Context, req *RegisterByMobileRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	SendMobileVerifyCode(ctx context.Context, req *SendMobileVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	UserPersonAuth(ctx context.Context, req *UserPersonAuthRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 }
 
 type UserHTTPClientImpl struct {
@@ -352,6 +375,19 @@ func (c *UserHTTPClientImpl) SendMobileVerifyCode(ctx context.Context, in *SendM
 	pattern := "/api/user/sendMobileVerifyCode"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserSendMobileVerifyCode))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) UserPersonAuth(ctx context.Context, in *UserPersonAuthRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/personalAuth"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUserPersonAuth))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
