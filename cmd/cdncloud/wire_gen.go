@@ -44,9 +44,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	userCompanyRepo := data.NewUserCompanyRepo(dataData, logger)
 	sessionHandle := sessions.NewSessionHandle()
 	userLogic := logic.NewUserLogic(userRepo, userPersonRepo, userCompanyRepo, sessionHandle)
-	sessionService := api.NewSessionService()
-	userService := api.NewUserService(userLogic, sessionService)
-	httpServer := server.NewHTTPServer(confServer, greeterService, userService, sessionService, logger)
+	userService := api.NewUserService(userLogic)
+	httpServer := server.NewHTTPServer(confServer, greeterService, userService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

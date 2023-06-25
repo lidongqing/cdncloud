@@ -11,13 +11,11 @@ import (
 type UserService struct {
 	user.UnimplementedUserServer
 	ul *logic.UserLogic
-	ss *SessionService
 }
 
-func NewUserService(ul *logic.UserLogic, ss *SessionService) *UserService {
+func NewUserService(ul *logic.UserLogic) *UserService {
 	return &UserService{
 		ul: ul,
-		ss: ss,
 	}
 }
 

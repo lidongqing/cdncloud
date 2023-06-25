@@ -2,7 +2,6 @@ package server
 
 import (
 	v1 "cdncloud/api/v1"
-	v1Session "cdncloud/api/v1/session"
 	v1User "cdncloud/api/v1/user"
 	"cdncloud/internal/conf"
 	"cdncloud/internal/service"
@@ -16,7 +15,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService *api.UserService, sessionService *api.SessionService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService *api.UserService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.ResponseEncoder(responseEncoder),
 		http.Middleware(
@@ -48,7 +47,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService 
 	srv.HandlePrefix("/q/", openAPIhandler)
 	v1.RegisterGreeterHTTPServer(srv, greeter)
 	v1User.RegisterUserHTTPServer(srv, userService)
-	v1Session.RegisterSessionHTTPServer(srv, sessionService)
 	return srv
 }
 

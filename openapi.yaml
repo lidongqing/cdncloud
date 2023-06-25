@@ -188,14 +188,14 @@ paths:
     /api/user/registerByMobile:
         post:
             tags:
-                - Session
+                - User
             description: 手机号注册
-            operationId: Session_RegisterSession
+            operationId: User_RegisterByMobile
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.v1.session.RegisterSessionRequest'
+                            $ref: '#/components/schemas/api.v1.user.RegisterByMobileRequest'
                 required: true
             responses:
                 "200":
@@ -203,7 +203,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.v1.session.RegisterSessionReply'
+                                $ref: '#/components/schemas/api.v1.user.RegisterReply'
     /api/user/sendEmailVerifyCode:
         post:
             tags:
@@ -320,22 +320,6 @@ paths:
                                 $ref: '#/components/schemas/helloworld.v1.HelloReply'
 components:
     schemas:
-        api.v1.session.RegisterSessionReply:
-            type: object
-            properties:
-                token:
-                    type: string
-                mobile:
-                    type: string
-        api.v1.session.RegisterSessionRequest:
-            type: object
-            properties:
-                mobile:
-                    type: string
-                password:
-                    type: string
-                code:
-                    type: string
         api.v1.user.ChangePasswdByEmailRequest:
             type: object
             properties:
@@ -527,5 +511,4 @@ components:
 tags:
     - name: Greeter
       description: The greeting service definition.
-    - name: Session
     - name: User
