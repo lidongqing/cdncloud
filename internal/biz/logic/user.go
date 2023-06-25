@@ -71,6 +71,12 @@ func (ul *UserLogic) RegisterByMobile(ctx *context.Context, mobilePre string, mo
 		Status:    model.USER_STATUS_NORMAL,
 	}
 	userId, err = ul.userRepo.Save(ctx, user)
+	if err != nil {
+		return 0, err
+	}
+
+	// 记录登录状态
+	err = ul.SetLoginStatus(ctx, userId)
 	return
 }
 
@@ -112,6 +118,9 @@ func (ul *UserLogic) RegisterByEmail(ctx *context.Context, email string, passwd 
 		Status:   model.USER_STATUS_NORMAL,
 	}
 	userId, err = ul.userRepo.Save(ctx, user)
+	if err != nil {
+		return 0, err
+	}
 
 	// 记录登录状态
 	err = ul.SetLoginStatus(ctx, userId)
@@ -231,7 +240,7 @@ func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, pa
 	//@todo:更新登录时间
 	//@todo:更新登录ip
 	//@todo:更新登录状态
-	return true, nil
+	return true, err
 }
 
 // 更新登录失败计数，登录失败次数超过5次，将暂时禁止登录
