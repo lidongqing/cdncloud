@@ -29,6 +29,6 @@ func (r *userPersonRepo) Save(ctx *context.Context, u *model.UserPerson) (id int
 // 根据用户id获取用户认证信息
 func (r *userPersonRepo) GetUserPersonInfoById(ctx *context.Context, userId int64) (user *model.UserPerson, err error) {
 	db := r.data.DataBase
-	err = db.Where("user_id = ?", userId).Find(&user).Error
+	err = db.Model(&model.UserPerson{}).Where("user_id = ?", userId).Find(&user).Error
 	return
 }

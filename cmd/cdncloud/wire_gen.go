@@ -14,6 +14,7 @@ import (
 	"cdncloud/internal/server"
 	"cdncloud/internal/service"
 	"cdncloud/internal/service/api"
+	"cdncloud/sessions"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -41,9 +42,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	userRepo := data.NewUserRepo(dataData, logger)
 	userPersonRepo := data.NewUserPersonRepo(dataData, logger)
 	userCompanyRepo := data.NewUserCompanyRepo(dataData, logger)
-	userLogic := logic.NewUserLogic(userRepo, userPersonRepo, userCompanyRepo)
-	userService := api.NewUserService(userLogic)
-	httpServer := server.NewHTTPServer(confServer, greeterService, userService, logger)
+	sessionHandle := sessions.NewSessionHandle()
+	userLogic := logic.NewUserLogic(userRepo, userPersonRepo, userCompanyRepo, sessionHandle)
+	sessionService := api.NewSessionService()
+	userService := api.NewUserService(userLogic, sessionService)
+	httpServer := server.NewHTTPServer(confServer, greeterService, userService, sessionService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

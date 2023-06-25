@@ -11,11 +11,13 @@ import (
 type UserService struct {
 	user.UnimplementedUserServer
 	ul *logic.UserLogic
+	ss *SessionService
 }
 
-func NewUserService(ul *logic.UserLogic) *UserService {
+func NewUserService(ul *logic.UserLogic, ss *SessionService) *UserService {
 	return &UserService{
 		ul: ul,
+		ss: ss,
 	}
 }
 
@@ -23,6 +25,9 @@ func NewUserService(ul *logic.UserLogic) *UserService {
 func (s *UserService) RegisterByMobile(ctx context.Context, in *user.RegisterByMobileRequest) (*user.RegisterReply, error) {
 	if in.Mobile == "" {
 		return nil, errors.New("手机号不能为空")
+	}
+	if in.Password == "" {
+		return nil, errors.New("密码不能为空")
 	}
 	//检查两次密码是否一致
 	if in.Password != in.Repassword {

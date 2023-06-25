@@ -2,6 +2,7 @@ package server
 
 import (
 	v1 "cdncloud/api/v1"
+	v1Session "cdncloud/api/v1/session"
 	v1User "cdncloud/api/v1/user"
 	"cdncloud/internal/conf"
 	"cdncloud/internal/service"
@@ -11,10 +12,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/go-kratos/swagger-api/openapiv2"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService *api.UserService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService *api.UserService, sessionService *api.SessionService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.ResponseEncoder(responseEncoder),
 		http.Middleware(
@@ -30,9 +32,23 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, userService 
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
+
+	// rdCmd := redis.NewClient(&redis.Options{
+	// 	Addr: "127.0.0.1:6379",
+	// })
+	// store, err := sessions.NewRedisStore(rdCmd, []byte("secret"))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// store.SetMaxAge(10 * 24 * 3600)
+	// s := &api.SessionService{Store: store}
+
 	srv := http.NewServer(opts...)
+	openAPIhandler := openapiv2.NewHandler()
+	srv.HandlePrefix("/q/", openAPIhandler)
 	v1.RegisterGreeterHTTPServer(srv, greeter)
 	v1User.RegisterUserHTTPServer(srv, userService)
+	v1Session.RegisterSessionHTTPServer(srv, sessionService)
 	return srv
 }
 

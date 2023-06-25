@@ -4,6 +4,7 @@ import (
 	v1User "cdncloud/api/v1/user"
 	"cdncloud/internal/biz/facade"
 	"cdncloud/internal/model"
+	"cdncloud/sessions"
 	"context"
 	"crypto/md5"
 	"encoding/base64"
@@ -11,6 +12,7 @@ import (
 	"errors"
 	"math/rand"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -18,13 +20,15 @@ type UserLogic struct {
 	userRepo        facade.UserRepo
 	userPersonRepo  facade.UserPersonRepo
 	userCompanyRepo facade.UserCompanyRepo
+	sessionHandle   *sessions.SessionHandle
 }
 
-func NewUserLogic(userRepo facade.UserRepo, userPersonRepo facade.UserPersonRepo, userCompanyRepo facade.UserCompanyRepo) *UserLogic {
+func NewUserLogic(userRepo facade.UserRepo, userPersonRepo facade.UserPersonRepo, userCompanyRepo facade.UserCompanyRepo, sessionHandle *sessions.SessionHandle) *UserLogic {
 	return &UserLogic{
 		userRepo:        userRepo,
 		userPersonRepo:  userPersonRepo,
 		userCompanyRepo: userCompanyRepo,
+		sessionHandle:   sessionHandle,
 	}
 }
 
@@ -108,6 +112,16 @@ func (ul *UserLogic) RegisterByEmail(ctx *context.Context, email string, passwd 
 		Status:   model.USER_STATUS_NORMAL,
 	}
 	userId, err = ul.userRepo.Save(ctx, user)
+
+	// 记录登录状态
+	err = ul.SetLoginStatus(ctx, userId)
+	return
+}
+
+// 记录用户登录状态
+func (ul *UserLogic) SetLoginStatus(ctx *context.Context, userId int64) (err error) {
+	userIdStr := strconv.Itoa(int(userId))
+	_, err = ul.sessionHandle.SetSession(*ctx, "user_id", userIdStr)
 	return
 }
 
@@ -125,7 +139,7 @@ func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, pa
 		return false, errors.New("验证码错误")
 	}
 
-	var user *model.User
+	var userId int64
 	// 根据邮箱和密码获取用户信息
 	if email != "" {
 		// 检查邮箱是否存在
@@ -164,6 +178,7 @@ func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, pa
 			}
 			return false, errors.New("用户名或密码错误")
 		}
+		userId = user.Id
 	}
 
 	// 根据手机号和密码获取用户信息
@@ -204,9 +219,14 @@ func (ul *UserLogic) Login(ctx *context.Context, email string, mobile string, pa
 			}
 			return false, errors.New("用户名或密码错误")
 		}
+		userId = user.Id
 	}
 	//登录成功，更新登录失败计数
-	ul.UpdateLoginFailCount(ctx, user.Id, true)
+	ul.UpdateLoginFailCount(ctx, userId, true)
+
+	// 记录登录状态
+	err = ul.SetLoginStatus(ctx, userId)
+
 	//@todo:记录登录日志
 	//@todo:更新登录时间
 	//@todo:更新登录ip
@@ -386,7 +406,15 @@ func (ul *UserLogic) CheckEmailCode(ctx *context.Context, email string, code str
 
 // session读取用户id
 func (ul *UserLogic) GetUserIdBySession(ctx *context.Context) (userId int64, err error) {
-	return 108262, nil
+	userIdStr, err := ul.sessionHandle.GetSession(*ctx, "user_id")
+	if err != nil {
+		return 0, err
+	}
+	if userIdStr == "" {
+		return 0, errors.New("用户未登录")
+	}
+	userId, _ = strconv.ParseInt(userIdStr, 10, 64)
+	return
 }
 
 // 获取用户信息

@@ -1,8 +1,6 @@
-package api
+package sessions
 
 import (
-	session "cdncloud/api/v1/session"
-	"cdncloud/sessions"
 	"context"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -11,26 +9,25 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type SessionService struct {
-	session.UnimplementedSessionServer
-	Store *sessions.RedisStore
+type SessionHandle struct {
+	Store *RedisStore
 }
 
-func NewSessionService() *SessionService {
+func NewSessionHandle() *SessionHandle {
 	rdCmd := redis.NewClient(&redis.Options{
 		Addr: "127.0.0.1:6379",
 	})
-	store, err := sessions.NewRedisStore(rdCmd, []byte("secret"))
+	store, err := NewRedisStore(rdCmd, []byte("secret"))
 	if err != nil {
 		panic(err)
 	}
 	store.SetMaxAge(10 * 24 * 3600)
-	return &SessionService{
+	return &SessionHandle{
 		Store: store,
 	}
 }
 
-func (s *SessionService) SetSession(ctx context.Context, key string, value string) (bool, error) {
+func (s *SessionHandle) SetSession(ctx context.Context, key string, value string) (bool, error) {
 	if tr, ok := transport.FromServerContext(ctx); ok {
 		if ht, ok := tr.(*http.Transport); ok {
 			// get a session
@@ -55,7 +52,7 @@ func (s *SessionService) SetSession(ctx context.Context, key string, value strin
 	return true, nil
 }
 
-func (s *SessionService) GetSession(ctx context.Context, key string) (string, error) {
+func (s *SessionHandle) GetSession(ctx context.Context, key string) (string, error) {
 	if tr, ok := transport.FromServerContext(ctx); ok {
 		if ht, ok := tr.(*http.Transport); ok {
 			// get a session
@@ -66,6 +63,9 @@ func (s *SessionService) GetSession(ctx context.Context, key string) (string, er
 
 			// get the value of the key
 			value := session.Values[key]
+			if value == nil {
+				return "", nil
+			}
 			return value.(string), nil
 		}
 	}
