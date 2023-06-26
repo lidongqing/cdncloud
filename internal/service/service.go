@@ -11,7 +11,10 @@ import (
 var ProviderSet = wire.NewSet(
 	NewGreeterService,
 	api.NewUserService,
+	api.NewWorkOrderService,
 	data.NewUserRepo,
 	data.NewUserPersonRepo,
 	data.NewUserCompanyRepo,
+	data.NewWorkOrderRepo,
+	data.NewWorkOrderDetailRepo,
 )

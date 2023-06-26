@@ -51,5 +51,6 @@ message GetWorkOrderListReply{
     string code = 1;
     string type = 2;
     int64 status = 3;
+    string createTime = 4;
   }
 }

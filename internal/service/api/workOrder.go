@@ -4,25 +4,39 @@ import (
 	wo "cdncloud/api/v1/workOrder"
 	"cdncloud/internal/biz/logic"
 	"context"
+	"errors"
 )
 
 type WorkOrderService struct {
 	wo.UnimplementedWorkOrderServer
-	ul *logic.UserLogic
+	wol *logic.WorkOrderLogic
 }
 
-func NewWorkOrderService(ul *logic.UserLogic) *WorkOrderService {
+func NewWorkOrderService(wol *logic.WorkOrderLogic) *WorkOrderService {
 	return &WorkOrderService{
-		ul: ul,
+		wol: wol,
 	}
 }
 
 // 工单提交
 func (s *WorkOrderService) AddWorkOrder(ctx context.Context, in *wo.AddWorkOrderRequest) (*wo.EmptyReply, error) {
-	return &wo.EmptyReply{}, nil
+	if in.Title == "" {
+		return nil, errors.New("标题不能为空")
+	}
+	if in.Content == "" {
+		return nil, errors.New("内容不能为空")
+	}
+	if in.Type == "" {
+		return nil, errors.New("类型不能为空")
+	}
+	if in.Weigh == 0 {
+		return nil, errors.New("优先级不能为空")
+	}
+	_, err := s.wol.CreateWorkOrder(&ctx, in)
+	return &wo.EmptyReply{}, err
 }
 
 // 工单列表
 func (s *WorkOrderService) GetWorkOrderList(ctx context.Context, in *wo.GetWorkOrderListRequest) (*wo.GetWorkOrderListReply, error) {
-	return &wo.GetWorkOrderListReply{}, nil
+	return s.wol.GetWorkOrderList(&ctx, in)
 }
