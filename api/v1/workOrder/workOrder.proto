@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package api.v1.workOrder;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "cdncloud/api/v1.workOrder";
+
+service workOrder {
+  // 工单提交
+  rpc AddWorkOrder (AddWorkOrderRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      post: "/api/workOrder/addWorkOrder"
+      body: "*"
+    };
+  }
+  // 工单列表
+  rpc GetWorkOrderList (GetWorkOrderListRequest) returns (GetWorkOrderListReply) {
+    option (google.api.http) = {
+      get: "/api/workOrder/getWorkOrderList"
+    };
+  }
+}
+
+message EmptyRequest {
+}
+
+message EmptyReply {
+}
+
+message AddWorkOrderRequest {
+  string type = 1;
+  string title = 2;
+  int64 weigh = 3;
+  string content = 4;
+  string image = 5;
+}
+
+message GetWorkOrderListRequest {
+  string type = 1;
+  int64 status = 2;
+  int64 page = 3;
+}
+
+message GetWorkOrderListReply{
+  int64 total = 1;
+  int64 page = 2;
+  repeated WorkOrderListItem list  = 3;
+  message WorkOrderListItem{
+    string code = 1;
+    string type = 2;
+    int64 status = 3;
+  }
+}

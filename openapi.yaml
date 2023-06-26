@@ -299,6 +299,53 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.user.EmptyReply'
+    /api/workOrder/addWorkOrder:
+        post:
+            tags:
+                - WorkOrder
+            description: 工单提交
+            operationId: WorkOrder_AddWorkOrder
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.workOrder.AddWorkOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.workOrder.EmptyReply'
+    /api/workOrder/getWorkOrderList:
+        get:
+            tags:
+                - WorkOrder
+            description: 工单列表
+            operationId: WorkOrder_GetWorkOrderList
+            parameters:
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.workOrder.GetWorkOrderListReply'
     /helloworld/{name}:
         get:
             tags:
@@ -502,6 +549,46 @@ components:
                     type: string
                 mobilePre:
                     type: string
+        api.v1.workOrder.AddWorkOrderRequest:
+            type: object
+            properties:
+                type:
+                    type: string
+                title:
+                    type: string
+                weigh:
+                    type: integer
+                    format: int64
+                content:
+                    type: string
+                image:
+                    type: string
+        api.v1.workOrder.EmptyReply:
+            type: object
+            properties: {}
+        api.v1.workOrder.GetWorkOrderListReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int64
+                page:
+                    type: integer
+                    format: int64
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.workOrder.GetWorkOrderListReply_WorkOrderListItem'
+        api.v1.workOrder.GetWorkOrderListReply_WorkOrderListItem:
+            type: object
+            properties:
+                code:
+                    type: string
+                type:
+                    type: string
+                status:
+                    type: integer
+                    format: int64
         helloworld.v1.HelloReply:
             type: object
             properties:
@@ -512,3 +599,4 @@ tags:
     - name: Greeter
       description: The greeting service definition.
     - name: User
+    - name: WorkOrder
