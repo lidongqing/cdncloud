@@ -103,11 +103,11 @@ type AddWorkOrderRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Type    string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Title   string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Weigh   int64  `protobuf:"varint,3,opt,name=weigh,proto3" json:"weigh,omitempty"`
-	Content string `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
-	Image   string `protobuf:"bytes,5,opt,name=image,proto3" json:"image,omitempty"`
+	Type    string `protobuf:"bytes,1,opt,name=type,proto3" json:"type"`
+	Title   string `protobuf:"bytes,2,opt,name=title,proto3" json:"title"`
+	Weigh   int64  `protobuf:"varint,3,opt,name=weigh,proto3" json:"weigh"`
+	Content string `protobuf:"bytes,4,opt,name=content,proto3" json:"content"`
+	Image   string `protobuf:"bytes,5,opt,name=image,proto3" json:"image"`
 }
 
 func (x *AddWorkOrderRequest) Reset() {
@@ -182,9 +182,9 @@ type GetWorkOrderListRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Type   string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Status int64  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
-	Page   int64  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
+	Type   string `protobuf:"bytes,1,opt,name=type,proto3" json:"type"`
+	Status int64  `protobuf:"varint,2,opt,name=status,proto3" json:"status"`
+	Page   int64  `protobuf:"varint,3,opt,name=page,proto3" json:"page"`
 }
 
 func (x *GetWorkOrderListRequest) Reset() {
@@ -245,9 +245,9 @@ type GetWorkOrderListReply struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Total int64                                      `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Page  int64                                      `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	List  []*GetWorkOrderListReply_WorkOrderListItem `protobuf:"bytes,3,rep,name=list,proto3" json:"list,omitempty"`
+	Total int64                                      `protobuf:"varint,1,opt,name=total,proto3" json:"total"`
+	Page  int64                                      `protobuf:"varint,2,opt,name=page,proto3" json:"page"`
+	List  []*GetWorkOrderListReply_WorkOrderListItem `protobuf:"bytes,3,rep,name=list,proto3" json:"list"`
 }
 
 func (x *GetWorkOrderListReply) Reset() {
@@ -308,10 +308,10 @@ type GetWorkOrderListReply_WorkOrderListItem struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Code       string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Type       string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Status     int64  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
-	CreateTime string `protobuf:"bytes,4,opt,name=createTime,proto3" json:"createTime,omitempty"`
+	Code       string `protobuf:"bytes,1,opt,name=code,proto3" json:"code"`
+	Type       string `protobuf:"bytes,2,opt,name=type,proto3" json:"type"`
+	Status     int64  `protobuf:"varint,3,opt,name=status,proto3" json:"status"`
+	CreateTime string `protobuf:"bytes,4,opt,name=createTime,proto3" json:"createTime"`
 }
 
 func (x *GetWorkOrderListReply_WorkOrderListItem) Reset() {

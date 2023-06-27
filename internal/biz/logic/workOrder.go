@@ -37,15 +37,18 @@ func (l *WorkOrderLogic) CreateWorkOrder(ctx *context.Context, req *v1WorkOrder.
 	// @todo:保存图片
 	imageUrl := ""
 	workOrder := &model.WorkOrder{
-		Code:       workOrderCode,
-		UserID:     userId,
-		Title:      req.Title,
-		Status:     1,
-		Type:       req.Type,
-		Weigh:      req.Weigh,
-		CreateTime: time.Now(),
-		ImgURL:     imageUrl,
-		FileData:   req.Image,
+		Code:        workOrderCode,
+		UserID:      userId,
+		Title:       req.Title,
+		Status:      1,
+		Type:        req.Type,
+		Weigh:       req.Weigh,
+		CreateTime:  time.Now(),
+		UpdateTime:  time.Now(),
+		EndTime:     time.Now(),
+		ReceiveTime: time.Now(),
+		ImgURL:      imageUrl,
+		FileData:    req.Image,
 	}
 	workOrderId, err = l.woRepo.Save(ctx, workOrder)
 	if err != nil {

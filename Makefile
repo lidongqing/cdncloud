@@ -44,6 +44,7 @@ api:
 	       --openapi_out=fq_schema_naming=true,default_response=false:. \
 	       $(API_PROTO_FILES)
 	sed -i "" -e "s/,omitempty//g" api/v1/user/user.pb.go
+	sed -i "" -e "s/,omitempty//g" api/v1/workOrder/workOrder.pb.go
 
 .PHONY: build
 # build
