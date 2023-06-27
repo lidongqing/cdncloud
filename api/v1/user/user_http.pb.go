@@ -20,7 +20,6 @@ const _ = http.SupportPackageIsVersion1
 const OperationUserChangePasswdByEmail = "/api.v1.user.User/ChangePasswdByEmail"
 const OperationUserChangePasswdByMobile = "/api.v1.user.User/ChangePasswdByMobile"
 const OperationUserGetAccountInfo = "/api.v1.user.User/GetAccountInfo"
-const OperationUserGetEmailVerifyCode = "/api.v1.user.User/GetEmailVerifyCode"
 const OperationUserGetImageVerifyCode = "/api.v1.user.User/GetImageVerifyCode"
 const OperationUserGetPromotionUrl = "/api.v1.user.User/GetPromotionUrl"
 const OperationUserGetUserCompanyAuthInfo = "/api.v1.user.User/GetUserCompanyAuthInfo"
@@ -28,6 +27,7 @@ const OperationUserGetUserPersonAuthInfo = "/api.v1.user.User/GetUserPersonAuthI
 const OperationUserLogin = "/api.v1.user.User/Login"
 const OperationUserRegisterByEmail = "/api.v1.user.User/RegisterByEmail"
 const OperationUserRegisterByMobile = "/api.v1.user.User/RegisterByMobile"
+const OperationUserSendEmailVerifyCode = "/api.v1.user.User/SendEmailVerifyCode"
 const OperationUserSendMobileVerifyCode = "/api.v1.user.User/SendMobileVerifyCode"
 const OperationUserUpdateEmail = "/api.v1.user.User/UpdateEmail"
 const OperationUserUpdateMobile = "/api.v1.user.User/UpdateMobile"
@@ -39,7 +39,6 @@ type UserHTTPServer interface {
 	ChangePasswdByEmail(context.Context, *ChangePasswdByEmailRequest) (*EmptyReply, error)
 	ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error)
 	GetAccountInfo(context.Context, *EmptyRequest) (*GetAccountInfoReply, error)
-	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	GetImageVerifyCode(context.Context, *EmptyRequest) (*GetImageVerifyCodeReply, error)
 	GetPromotionUrl(context.Context, *EmptyRequest) (*GetPromotionUrlReply, error)
 	GetUserCompanyAuthInfo(context.Context, *EmptyRequest) (*GetUserCompanyAuthReply, error)
@@ -47,6 +46,7 @@ type UserHTTPServer interface {
 	Login(context.Context, *LoginRequest) (*EmptyReply, error)
 	RegisterByEmail(context.Context, *RegisterByEmailRequest) (*RegisterReply, error)
 	RegisterByMobile(context.Context, *RegisterByMobileRequest) (*RegisterReply, error)
+	SendEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
 	UpdateEmail(context.Context, *UpdateEmailRequest) (*EmptyReply, error)
 	UpdateMobile(context.Context, *UpdateMobileRequest) (*EmptyReply, error)
@@ -62,7 +62,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/api/user/login", _User_Login0_HTTP_Handler(srv))
 	r.GET("/api/user/getImageVerifyCode", _User_GetImageVerifyCode0_HTTP_Handler(srv))
 	r.POST("/api/user/sendMobileVerifyCode", _User_SendMobileVerifyCode0_HTTP_Handler(srv))
-	r.POST("/api/user/sendEmailVerifyCode", _User_GetEmailVerifyCode0_HTTP_Handler(srv))
+	r.POST("/api/user/sendEmailVerifyCode", _User_SendEmailVerifyCode0_HTTP_Handler(srv))
 	r.POST("/api/user/changePasswdByMobile", _User_ChangePasswdByMobile0_HTTP_Handler(srv))
 	r.POST("/api/user/changePasswdByEmail", _User_ChangePasswdByEmail0_HTTP_Handler(srv))
 	r.GET("/api/user/getAccountInfo", _User_GetAccountInfo0_HTTP_Handler(srv))
@@ -171,15 +171,15 @@ func _User_SendMobileVerifyCode0_HTTP_Handler(srv UserHTTPServer) func(ctx http.
 	}
 }
 
-func _User_GetEmailVerifyCode0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _User_SendEmailVerifyCode0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in SendEmailVerifyCodeRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetEmailVerifyCode)
+		http.SetOperation(ctx, OperationUserSendEmailVerifyCode)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetEmailVerifyCode(ctx, req.(*SendEmailVerifyCodeRequest))
+			return srv.SendEmailVerifyCode(ctx, req.(*SendEmailVerifyCodeRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -403,7 +403,6 @@ type UserHTTPClient interface {
 	ChangePasswdByEmail(ctx context.Context, req *ChangePasswdByEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ChangePasswdByMobile(ctx context.Context, req *ChangePasswdByMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetAccountInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetAccountInfoReply, err error)
-	GetEmailVerifyCode(ctx context.Context, req *SendEmailVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	GetImageVerifyCode(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetImageVerifyCodeReply, err error)
 	GetPromotionUrl(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetPromotionUrlReply, err error)
 	GetUserCompanyAuthInfo(ctx context.Context, req *EmptyRequest, opts ...http.CallOption) (rsp *GetUserCompanyAuthReply, err error)
@@ -411,6 +410,7 @@ type UserHTTPClient interface {
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	RegisterByEmail(ctx context.Context, req *RegisterByEmailRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	RegisterByMobile(ctx context.Context, req *RegisterByMobileRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
+	SendEmailVerifyCode(ctx context.Context, req *SendEmailVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	SendMobileVerifyCode(ctx context.Context, req *SendMobileVerifyCodeRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	UpdateEmail(ctx context.Context, req *UpdateEmailRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	UpdateMobile(ctx context.Context, req *UpdateMobileRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
@@ -460,19 +460,6 @@ func (c *UserHTTPClientImpl) GetAccountInfo(ctx context.Context, in *EmptyReques
 	opts = append(opts, http.Operation(OperationUserGetAccountInfo))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
-}
-
-func (c *UserHTTPClientImpl) GetEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...http.CallOption) (*EmptyReply, error) {
-	var out EmptyReply
-	pattern := "/api/user/sendEmailVerifyCode"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserGetEmailVerifyCode))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -562,6 +549,19 @@ func (c *UserHTTPClientImpl) RegisterByMobile(ctx context.Context, in *RegisterB
 	pattern := "/api/user/registerByMobile"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserRegisterByMobile))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) SendEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...http.CallOption) (*EmptyReply, error) {
+	var out EmptyReply
+	pattern := "/api/user/sendEmailVerifyCode"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserSendEmailVerifyCode))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

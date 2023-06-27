@@ -33,7 +33,7 @@ type UserClient interface {
 	// 发送手机验证码
 	SendMobileVerifyCode(ctx context.Context, in *SendMobileVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 发送邮箱验证码
-	GetEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	SendEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 通过手机修改密码
 	ChangePasswdByMobile(ctx context.Context, in *ChangePasswdByMobileRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 通过邮箱修改密码
@@ -111,9 +111,9 @@ func (c *userClient) SendMobileVerifyCode(ctx context.Context, in *SendMobileVer
 	return out, nil
 }
 
-func (c *userClient) GetEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+func (c *userClient) SendEmailVerifyCode(ctx context.Context, in *SendEmailVerifyCodeRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
 	out := new(EmptyReply)
-	err := c.cc.Invoke(ctx, "/api.v1.user.User/GetEmailVerifyCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.v1.user.User/SendEmailVerifyCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ type UserServer interface {
 	// 发送手机验证码
 	SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error)
 	// 发送邮箱验证码
-	GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
+	SendEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error)
 	// 通过手机修改密码
 	ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error)
 	// 通过邮箱修改密码
@@ -279,8 +279,8 @@ func (UnimplementedUserServer) GetImageVerifyCode(context.Context, *EmptyRequest
 func (UnimplementedUserServer) SendMobileVerifyCode(context.Context, *SendMobileVerifyCodeRequest) (*EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMobileVerifyCode not implemented")
 }
-func (UnimplementedUserServer) GetEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEmailVerifyCode not implemented")
+func (UnimplementedUserServer) SendEmailVerifyCode(context.Context, *SendEmailVerifyCodeRequest) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmailVerifyCode not implemented")
 }
 func (UnimplementedUserServer) ChangePasswdByMobile(context.Context, *ChangePasswdByMobileRequest) (*EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePasswdByMobile not implemented")
@@ -418,20 +418,20 @@ func _User_SendMobileVerifyCode_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetEmailVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _User_SendEmailVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendEmailVerifyCodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetEmailVerifyCode(ctx, in)
+		return srv.(UserServer).SendEmailVerifyCode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.v1.user.User/GetEmailVerifyCode",
+		FullMethod: "/api.v1.user.User/SendEmailVerifyCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetEmailVerifyCode(ctx, req.(*SendEmailVerifyCodeRequest))
+		return srv.(UserServer).SendEmailVerifyCode(ctx, req.(*SendEmailVerifyCodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -662,8 +662,8 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_SendMobileVerifyCode_Handler,
 		},
 		{
-			MethodName: "GetEmailVerifyCode",
-			Handler:    _User_GetEmailVerifyCode_Handler,
+			MethodName: "SendEmailVerifyCode",
+			Handler:    _User_SendEmailVerifyCode_Handler,
 		},
 		{
 			MethodName: "ChangePasswdByMobile",

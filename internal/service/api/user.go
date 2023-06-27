@@ -83,6 +83,11 @@ func (s *UserService) Login(ctx context.Context, in *user.LoginRequest) (*user.E
 	return &user.EmptyReply{}, err
 }
 
+// 获取图片验证码
+func (s *UserService) GetImageVerifyCode(ctx context.Context, in *user.EmptyRequest) (*user.GetImageVerifyCodeReply, error) {
+	return &user.GetImageVerifyCodeReply{}, nil
+}
+
 // 通过手机号修改密码
 func (s *UserService) ChangePasswdByMobile(ctx context.Context, in *user.ChangePasswdByMobileRequest) (*user.EmptyReply, error) {
 	if in.Mobile == "" {

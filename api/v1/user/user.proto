@@ -43,7 +43,7 @@ service User {
     };
   }
   // 发送邮箱验证码
-  rpc GetEmailVerifyCode (SendEmailVerifyCodeRequest) returns (EmptyReply) {
+  rpc SendEmailVerifyCode (SendEmailVerifyCodeRequest) returns (EmptyReply) {
     option (google.api.http) = {
       post: "/api/user/sendEmailVerifyCode"
       body: "*"

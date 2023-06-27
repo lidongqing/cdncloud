@@ -209,7 +209,7 @@ paths:
             tags:
                 - User
             description: 发送邮箱验证码
-            operationId: User_GetEmailVerifyCode
+            operationId: User_SendEmailVerifyCode
             requestBody:
                 content:
                     application/json:
