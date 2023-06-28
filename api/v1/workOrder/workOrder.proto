@@ -21,6 +21,12 @@ service workOrder {
       get: "/api/workOrder/getWorkOrderList"
     };
   }
+  // 工单详情
+  rpc GetWorkOrderDetail (GetWorkOrderDetailRequest) returns (GetWorkOrderDetailReply) {
+    option (google.api.http) = {
+      get: "/api/workOrder/getWorkOrderDetail"
+    };
+  }
 }
 
 message EmptyRequest {
@@ -48,9 +54,33 @@ message GetWorkOrderListReply{
   int64 page = 2;
   repeated WorkOrderListItem list  = 3;
   message WorkOrderListItem{
-    string code = 1;
-    string type = 2;
-    int64 status = 3;
-    string createTime = 4;
+    int64 id = 1;
+    string code = 2;
+    string type = 3;
+    int64 status = 4;
+    string createTime = 5;
   }
+}
+
+message GetWorkOrderDetailRequest {
+  int64 id = 1;
+}
+
+message GetWorkOrderDetailReply {
+  string code = 1;
+  string title = 2;
+  string type = 3;
+  int64 weigh = 4;
+  string weighName = 5;
+  int64 status = 6;
+  string statusName = 7;
+  string createTime = 8;
+  repeated WorkOrderDetailListItem replyList = 9;
+}
+
+message WorkOrderDetailListItem {
+  string content = 1;
+  string createTime = 2;
+  int64 type = 3;
+  int64 look = 4;
 }

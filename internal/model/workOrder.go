@@ -39,4 +39,8 @@ const (
 	WORK_ORDER_STATUS_END    = 2 // 已完成
 	WORK_ORDER_STATUS_EVAL   = 3 // 已评价
 	WORK_ORDER_STATUS_CANCEL = 4 // 已取消
+
+	// 工单优先级
+	WORK_ORDER_WEIGH_LOW  = 0 // 普通
+	WORK_ORDER_WEIGH_HIGH = 1 // 紧急
 )

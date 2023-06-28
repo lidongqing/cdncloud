@@ -97,6 +97,41 @@ func (l *WorkOrderLogic) GetWorkOrderList(ctx *context.Context, req *v1WorkOrder
 	return
 }
 
+// 获取工单详情
+func (l *WorkOrderLogic) GetWorkOrderDetail(ctx *context.Context, req *v1WorkOrder.GetWorkOrderDetailRequest) (workOrderDetailRes *v1WorkOrder.GetWorkOrderDetailReply, err error) {
+	// 获取工单基础信息
+	workOrder, err := l.woRepo.GetWorkOrderById(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	// 工单详情列表
+	workOrderDetailList, err := l.wodRepo.GetWorkOrderDetailListByWorkOrderId(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	workOrderDetailRes = &v1WorkOrder.GetWorkOrderDetailReply{
+		Title:      workOrder.Title,
+		Code:       workOrder.Code,
+		Status:     workOrder.Status,
+		StatusName: l.GetWorkOrderStatus(workOrder.Status),
+		Type:       workOrder.Type,
+		Weigh:      workOrder.Weigh,
+		WeighName:  l.GetWorkOrderWeigh(workOrder.Weigh),
+		CreateTime: workOrder.CreateTime.Format("2006-01-02 15:04:05"),
+		ReplyList:  make([]*v1WorkOrder.WorkOrderDetailListItem, 0),
+	}
+	for _, workOrderDetail := range workOrderDetailList {
+		workOrderDetailRes.ReplyList = append(workOrderDetailRes.ReplyList, &v1WorkOrder.WorkOrderDetailListItem{
+			Content:    workOrderDetail.Content,
+			CreateTime: workOrderDetail.CreateTime.Format("2006-01-02 15:04:05"),
+			Type:       workOrderDetail.Type,
+			Look:       workOrderDetail.Look,
+		})
+	}
+	return
+}
+
 // session读取用户id
 func (wol *WorkOrderLogic) GetUserIdBySession(ctx *context.Context) (userId int64, err error) {
 	userIdStr, err := wol.sessionHandle.GetSession(*ctx, "user_id")
@@ -108,4 +143,46 @@ func (wol *WorkOrderLogic) GetUserIdBySession(ctx *context.Context) (userId int6
 	}
 	userId, _ = strconv.ParseInt(userIdStr, 10, 64)
 	return
+}
+
+// 读取工单状态
+func (wol *WorkOrderLogic) GetWorkOrderStatus(status int64) string {
+	switch status {
+	case model.WORK_ORDER_STATUS_WAIT:
+		return "待接单"
+	case model.WORK_ORDER_STATUS_ING:
+		return "处理中"
+	case model.WORK_ORDER_STATUS_END:
+		return "已完成"
+	case model.WORK_ORDER_STATUS_EVAL:
+		return "已评价"
+	case model.WORK_ORDER_STATUS_CANCEL:
+		return "已取消"
+	default:
+		return ""
+	}
+}
+
+// 读取工单优先级
+func (wol *WorkOrderLogic) GetWorkOrderWeigh(weigh int64) string {
+	switch weigh {
+	case model.WORK_ORDER_WEIGH_LOW:
+		return "普通"
+	case model.WORK_ORDER_WEIGH_HIGH:
+		return "紧急"
+	default:
+		return ""
+	}
+}
+
+// 获取所有工单类型
+func (wol *WorkOrderLogic) GetWorkOrderType() []string {
+	return []string{
+		"售前",
+		"云主机",
+		"CDN",
+		"财务",
+		"CDNex",
+		"其他",
+	}
 }

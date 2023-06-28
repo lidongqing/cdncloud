@@ -26,9 +26,9 @@ func (r *workOrderDetailRepo) Save(ctx *context.Context, u *model.WorkOrderDetai
 	return u.Id, err
 }
 
-// 根据工单id获取工单详情
-func (r *workOrderDetailRepo) GetWorkOrderDetailByWorkOrderId(ctx *context.Context, workOrderId int64) (workOrderDetail *model.WorkOrderDetail, err error) {
+// 根据工单id获取工单详情列表
+func (r *workOrderDetailRepo) GetWorkOrderDetailListByWorkOrderId(ctx *context.Context, workOrderId int64) (workOrderDetailList []*model.WorkOrderDetail, err error) {
 	db := r.data.DataBase
-	err = db.Where("work_order_id = ?", workOrderId).Find(&workOrderDetail).Error
-	return
+	err = db.Where("w_id = ?", workOrderId).Find(&workOrderDetailList).Order("create_time ASC").Error
+	return workOrderDetailList, err
 }

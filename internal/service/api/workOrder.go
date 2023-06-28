@@ -40,3 +40,8 @@ func (s *WorkOrderService) AddWorkOrder(ctx context.Context, in *wo.AddWorkOrder
 func (s *WorkOrderService) GetWorkOrderList(ctx context.Context, in *wo.GetWorkOrderListRequest) (*wo.GetWorkOrderListReply, error) {
 	return s.wol.GetWorkOrderList(&ctx, in)
 }
+
+// 工单详情
+func (s *WorkOrderService) GetWorkOrderDetail(ctx context.Context, in *wo.GetWorkOrderDetailRequest) (*wo.GetWorkOrderDetailReply, error) {
+	return s.wol.GetWorkOrderDetail(&ctx, in)
+}

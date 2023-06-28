@@ -42,10 +42,16 @@ api:
  	       --go-http_out=paths=source_relative:./api \
  	       --go-grpc_out=paths=source_relative:./api \
 	       --openapi_out=fq_schema_naming=true,default_response=false:. \
-	       $(API_PROTO_FILES)
+	       $(API_PROTO_FILES) \
+
+sed-dev:
 	sed -i "" -e "s/,omitempty//g" api/v1/user/user.pb.go
 	sed -i "" -e "s/,omitempty//g" api/v1/workOrder/workOrder.pb.go
 
+sed-online:
+	sed -i "s/,omitempty//g" api/v1/user/user.pb.go
+	sed -i "s/,omitempty//g" api/v1/workOrder/workOrder.pb.go
+	
 .PHONY: build
 # build
 build:

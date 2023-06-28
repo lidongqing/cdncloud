@@ -26,6 +26,8 @@ type WorkOrderClient interface {
 	AddWorkOrder(ctx context.Context, in *AddWorkOrderRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	// 工单列表
 	GetWorkOrderList(ctx context.Context, in *GetWorkOrderListRequest, opts ...grpc.CallOption) (*GetWorkOrderListReply, error)
+	// 工单详情
+	GetWorkOrderDetail(ctx context.Context, in *GetWorkOrderDetailRequest, opts ...grpc.CallOption) (*GetWorkOrderDetailReply, error)
 }
 
 type workOrderClient struct {
@@ -54,6 +56,15 @@ func (c *workOrderClient) GetWorkOrderList(ctx context.Context, in *GetWorkOrder
 	return out, nil
 }
 
+func (c *workOrderClient) GetWorkOrderDetail(ctx context.Context, in *GetWorkOrderDetailRequest, opts ...grpc.CallOption) (*GetWorkOrderDetailReply, error) {
+	out := new(GetWorkOrderDetailReply)
+	err := c.cc.Invoke(ctx, "/api.v1.workOrder.workOrder/GetWorkOrderDetail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServer is the server API for WorkOrder service.
 // All implementations must embed UnimplementedWorkOrderServer
 // for forward compatibility
@@ -62,6 +73,8 @@ type WorkOrderServer interface {
 	AddWorkOrder(context.Context, *AddWorkOrderRequest) (*EmptyReply, error)
 	// 工单列表
 	GetWorkOrderList(context.Context, *GetWorkOrderListRequest) (*GetWorkOrderListReply, error)
+	// 工单详情
+	GetWorkOrderDetail(context.Context, *GetWorkOrderDetailRequest) (*GetWorkOrderDetailReply, error)
 	mustEmbedUnimplementedWorkOrderServer()
 }
 
@@ -74,6 +87,9 @@ func (UnimplementedWorkOrderServer) AddWorkOrder(context.Context, *AddWorkOrderR
 }
 func (UnimplementedWorkOrderServer) GetWorkOrderList(context.Context, *GetWorkOrderListRequest) (*GetWorkOrderListReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkOrderList not implemented")
+}
+func (UnimplementedWorkOrderServer) GetWorkOrderDetail(context.Context, *GetWorkOrderDetailRequest) (*GetWorkOrderDetailReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkOrderDetail not implemented")
 }
 func (UnimplementedWorkOrderServer) mustEmbedUnimplementedWorkOrderServer() {}
 
@@ -124,6 +140,24 @@ func _WorkOrder_GetWorkOrderList_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrder_GetWorkOrderDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkOrderDetailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServer).GetWorkOrderDetail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.workOrder.workOrder/GetWorkOrderDetail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServer).GetWorkOrderDetail(ctx, req.(*GetWorkOrderDetailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrder_ServiceDesc is the grpc.ServiceDesc for WorkOrder service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -138,6 +172,10 @@ var WorkOrder_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkOrderList",
 			Handler:    _WorkOrder_GetWorkOrderList_Handler,
+		},
+		{
+			MethodName: "GetWorkOrderDetail",
+			Handler:    _WorkOrder_GetWorkOrderDetail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

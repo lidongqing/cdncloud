@@ -318,6 +318,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.workOrder.EmptyReply'
+    /api/workOrder/getWorkOrderDetail:
+        get:
+            tags:
+                - WorkOrder
+            description: 工单详情
+            operationId: WorkOrder_GetWorkOrderDetail
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.v1.workOrder.GetWorkOrderDetailReply'
     /api/workOrder/getWorkOrderList:
         get:
             tags:
@@ -566,6 +585,31 @@ components:
         api.v1.workOrder.EmptyReply:
             type: object
             properties: {}
+        api.v1.workOrder.GetWorkOrderDetailReply:
+            type: object
+            properties:
+                code:
+                    type: string
+                title:
+                    type: string
+                type:
+                    type: string
+                weigh:
+                    type: integer
+                    format: int64
+                weighName:
+                    type: string
+                status:
+                    type: integer
+                    format: int64
+                statusName:
+                    type: string
+                createTime:
+                    type: string
+                replyList:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.v1.workOrder.WorkOrderDetailListItem'
         api.v1.workOrder.GetWorkOrderListReply:
             type: object
             properties:
@@ -582,6 +626,9 @@ components:
         api.v1.workOrder.GetWorkOrderListReply_WorkOrderListItem:
             type: object
             properties:
+                id:
+                    type: integer
+                    format: int64
                 code:
                     type: string
                 type:
@@ -591,6 +638,19 @@ components:
                     format: int64
                 createTime:
                     type: string
+        api.v1.workOrder.WorkOrderDetailListItem:
+            type: object
+            properties:
+                content:
+                    type: string
+                createTime:
+                    type: string
+                type:
+                    type: integer
+                    format: int64
+                look:
+                    type: integer
+                    format: int64
         helloworld.v1.HelloReply:
             type: object
             properties:

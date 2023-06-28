@@ -18,10 +18,12 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationWorkOrderAddWorkOrder = "/api.v1.workOrder.workOrder/AddWorkOrder"
+const OperationWorkOrderGetWorkOrderDetail = "/api.v1.workOrder.workOrder/GetWorkOrderDetail"
 const OperationWorkOrderGetWorkOrderList = "/api.v1.workOrder.workOrder/GetWorkOrderList"
 
 type WorkOrderHTTPServer interface {
 	AddWorkOrder(context.Context, *AddWorkOrderRequest) (*EmptyReply, error)
+	GetWorkOrderDetail(context.Context, *GetWorkOrderDetailRequest) (*GetWorkOrderDetailReply, error)
 	GetWorkOrderList(context.Context, *GetWorkOrderListRequest) (*GetWorkOrderListReply, error)
 }
 
@@ -29,6 +31,7 @@ func RegisterWorkOrderHTTPServer(s *http.Server, srv WorkOrderHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/workOrder/addWorkOrder", _WorkOrder_AddWorkOrder0_HTTP_Handler(srv))
 	r.GET("/api/workOrder/getWorkOrderList", _WorkOrder_GetWorkOrderList0_HTTP_Handler(srv))
+	r.GET("/api/workOrder/getWorkOrderDetail", _WorkOrder_GetWorkOrderDetail0_HTTP_Handler(srv))
 }
 
 func _WorkOrder_AddWorkOrder0_HTTP_Handler(srv WorkOrderHTTPServer) func(ctx http.Context) error {
@@ -69,8 +72,28 @@ func _WorkOrder_GetWorkOrderList0_HTTP_Handler(srv WorkOrderHTTPServer) func(ctx
 	}
 }
 
+func _WorkOrder_GetWorkOrderDetail0_HTTP_Handler(srv WorkOrderHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetWorkOrderDetailRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationWorkOrderGetWorkOrderDetail)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetWorkOrderDetail(ctx, req.(*GetWorkOrderDetailRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetWorkOrderDetailReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type WorkOrderHTTPClient interface {
 	AddWorkOrder(ctx context.Context, req *AddWorkOrderRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	GetWorkOrderDetail(ctx context.Context, req *GetWorkOrderDetailRequest, opts ...http.CallOption) (rsp *GetWorkOrderDetailReply, err error)
 	GetWorkOrderList(ctx context.Context, req *GetWorkOrderListRequest, opts ...http.CallOption) (rsp *GetWorkOrderListReply, err error)
 }
 
@@ -89,6 +112,19 @@ func (c *WorkOrderHTTPClientImpl) AddWorkOrder(ctx context.Context, in *AddWorkO
 	opts = append(opts, http.Operation(OperationWorkOrderAddWorkOrder))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *WorkOrderHTTPClientImpl) GetWorkOrderDetail(ctx context.Context, in *GetWorkOrderDetailRequest, opts ...http.CallOption) (*GetWorkOrderDetailReply, error) {
+	var out GetWorkOrderDetailReply
+	pattern := "/api/workOrder/getWorkOrderDetail"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationWorkOrderGetWorkOrderDetail))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

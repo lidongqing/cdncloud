@@ -45,3 +45,10 @@ func (r *workOrderRepo) GetWorkOrderList(ctx *context.Context, userId int64, sta
 	err = db.Count(&count).Error
 	return
 }
+
+// 根据id获取工单基础信息
+func (r *workOrderRepo) GetWorkOrderById(ctx *context.Context, id int64) (workOrder *model.WorkOrder, err error) {
+	db := r.data.DataBase
+	err = db.Where("id = ?", id).First(&workOrder).Error
+	return
+}
