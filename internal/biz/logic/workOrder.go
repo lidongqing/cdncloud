@@ -7,6 +7,8 @@ import (
 	"cdncloud/sessions"
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -33,7 +35,7 @@ func (l *WorkOrderLogic) CreateWorkOrder(ctx *context.Context, req *v1WorkOrder.
 	}
 	// 创建工单
 	// @todo:生成工单编号
-	workOrderCode := ""
+	workOrderCode := l.CreateWorkOrderCode()
 	// @todo:保存图片
 	imageUrl := ""
 	workOrder := &model.WorkOrder{
@@ -88,8 +90,10 @@ func (l *WorkOrderLogic) GetWorkOrderList(ctx *context.Context, req *v1WorkOrder
 	}
 	for _, workOrder := range workOrderList {
 		workOrderRes.List = append(workOrderRes.List, &v1WorkOrder.GetWorkOrderListReply_WorkOrderListItem{
+			Id:         workOrder.Id,
 			Code:       workOrder.Code,
 			Status:     workOrder.Status,
+			StatusName: l.GetWorkOrderStatus(workOrder.Status),
 			Type:       workOrder.Type,
 			CreateTime: workOrder.CreateTime.Format("2006-01-02 15:04:05"),
 		})
@@ -130,6 +134,20 @@ func (l *WorkOrderLogic) GetWorkOrderDetail(ctx *context.Context, req *v1WorkOrd
 		})
 	}
 	return
+}
+
+// 生成工单编号
+func (l *WorkOrderLogic) CreateWorkOrderCode() string {
+	// 生成当前时间
+	now := time.Now()
+	// 格式化时间为字符串
+	timeStr := now.Format("20060102150405")
+	// 生成3位随机数字
+	rand.Seed(now.UnixNano())
+	randNum := rand.Intn(1000)
+	// 拼接字符串
+	code := fmt.Sprintf("%s%03d", timeStr, randNum)
+	return code
 }
 
 // session读取用户id

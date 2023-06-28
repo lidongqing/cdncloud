@@ -43,5 +43,8 @@ func (s *WorkOrderService) GetWorkOrderList(ctx context.Context, in *wo.GetWorkO
 
 // 工单详情
 func (s *WorkOrderService) GetWorkOrderDetail(ctx context.Context, in *wo.GetWorkOrderDetailRequest) (*wo.GetWorkOrderDetailReply, error) {
+	if in.Id == 0 {
+		return nil, errors.New("工单ID不能为空")
+	}
 	return s.wol.GetWorkOrderDetail(&ctx, in)
 }

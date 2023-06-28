@@ -636,6 +636,8 @@ components:
                 status:
                     type: integer
                     format: int64
+                statusName:
+                    type: string
                 createTime:
                     type: string
         api.v1.workOrder.WorkOrderDetailListItem:
