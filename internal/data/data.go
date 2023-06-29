@@ -33,7 +33,7 @@ func NewData(c *conf.Data, logger log.Logger, db *gorm.DB) (*Data, func(), error
 func NewDataBase(c *conf.Data) (*gorm.DB, error) {
 	// dsn 数据库链接
 	// "用户名":"密码"@tcp("IP":"端口")/"数据库名称"?charset=utf8mb4&parseTime=True&loc=Local
-	dsn := "root:123456@tcp(127.0.0.1:3306)/cloudms?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := c.Database.Source
 	db, err := gorm.Open(
 		mysql.Open(dsn),
 		&gorm.Config{})

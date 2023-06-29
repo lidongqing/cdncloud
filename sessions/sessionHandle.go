@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"cdncloud/internal/conf"
 	"context"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -13,9 +14,9 @@ type SessionHandle struct {
 	Store *RedisStore
 }
 
-func NewSessionHandle() *SessionHandle {
+func NewSessionHandle(c *conf.Data) *SessionHandle {
 	rdCmd := redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379",
+		Addr: c.Redis.Addr,
 	})
 	store, err := NewRedisStore(rdCmd, []byte("secret"))
 	if err != nil {
